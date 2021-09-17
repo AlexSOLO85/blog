@@ -1,17 +1,16 @@
 package main.model;
 
 import lombok.*;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+/**
+ * The type Captcha codes.
+ */
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 
 @Entity
 @Table(name = "captcha_codes")
@@ -29,17 +28,4 @@ public class CaptchaCodes {
 
     @Column(name = "secret_code", nullable = false)
     private String secretCode;
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        CaptchaCodes captchaCodes = (CaptchaCodes) o;
-        return Objects.equals(id, captchaCodes.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return 0;
-    }
 }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="3.1" author="Alexander">
+        <dropColumn columnName="parent_id" tableName="post_comments"/>
+    </changeSet>
+    <changeSet id="3.2" author="Alexander">
+        <addColumn tableName="post_comments">
+            <column name="parent_id" type="BIGINT">
+                <constraints foreignKeyName="FK_POST_COMMENTS_ON_PARENT" references="posts(id)"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet id="3.3" author="Alexander">
+        <dropNotNullConstraint columnDataType="bigint" columnName="parent_id" tableName="post_comments"/>
+    </changeSet>
+
+</databaseChangeLog>

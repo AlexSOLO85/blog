@@ -4,11 +4,12 @@ import lombok.*;
 
 import javax.persistence.*;
 
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+/**
+ * The type Global settings.
+ */
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 
 @Entity
 @Table(name = "global_settings")

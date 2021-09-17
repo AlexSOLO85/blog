@@ -3,22 +3,21 @@ package main.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import main.model.enumerated.ModerationStatus;
-import org.hibernate.Hibernate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 
-@Getter
-@Setter
-@ToString
-@RequiredArgsConstructor
+/**
+ * The type Post.
+ */
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 
 @Entity
 @Table(name = "posts")
-public class Posts {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -36,7 +35,7 @@ public class Posts {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private Users users;
+    private User user;
 
     @Column(name = "time", nullable = false)
     private LocalDateTime time;
@@ -50,21 +49,16 @@ public class Posts {
     @Column(name = "view_count", nullable = false)
     private Integer viewCount;
 
-    @OneToMany(mappedBy = "posts")
+    @OneToMany(mappedBy = "post")
     @JsonIgnore
     @ToString.Exclude
     private List<PostVotes> postVotes;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
-        Posts posts = (Posts) o;
-        return Objects.equals(id, posts.id);
-    }
+    @OneToMany(mappedBy = "parentId")
+    @JsonIgnore
+    @ToString.Exclude
+    private List<PostComments> postComments;
 
-    @Override
-    public int hashCode() {
-        return 0;
-    }
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "posts")
+    private List<Tags> tags;
 }
