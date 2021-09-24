@@ -10,11 +10,15 @@ import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConf
 @SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class})
 public class Blog {
     /**
-     * The entry point of application.
+     * Main.
      *
-     * @param args the input arguments
+     * @param args the args
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
+        new Blog().run(args);
+    }
+
+    private void run(final String[] args) {
         SpringApplication.run(Blog.class, args);
     }
 }

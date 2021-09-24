@@ -86,7 +86,7 @@
             <column name="is_active" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="moderation_status" type="VARCHAR(255)">
+            <column name="moderation_status" type="VARCHAR(255)" defaultValue="NEW">
                 <constraints nullable="false"/>
             </column>
             <column name="moderator_id" type="BIGINT"/>
@@ -129,7 +129,7 @@
     </changeSet>
     <changeSet id="1.8" author="Alexander">
         <createTable tableName="users">
-            <column name="id" type="BIGINT">
+            <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_users"/>
             </column>
             <column name="is_moderator" type="BOOLEAN">

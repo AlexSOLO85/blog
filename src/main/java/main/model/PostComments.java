@@ -1,8 +1,17 @@
 package main.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.GenerationType;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 import java.time.LocalDateTime;
 
 /**
@@ -15,26 +24,44 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "post_comments")
 public class PostComments {
+    /**
+     * The Id.
+     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
 
+    /**
+     * The Parent id.
+     */
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private Post parentId;
 
+    /**
+     * The Post.
+     */
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
+    /**
+     * The User.
+     */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    /**
+     * The Time.
+     */
     @Column(name = "time", nullable = false)
     private LocalDateTime time;
 
+    /**
+     * The Text.
+     */
     @Column(name = "text", nullable = false)
     private String text;
 }

@@ -14,3 +14,11 @@ spring:
           format_sql: true
           dialect: org.hibernate.dialect.MySQL8Dialect
           ddl-auto: validate
+
+blog:
+  copyright: Дмитрий Сергеев
+  copyrightFrom: 2005
+  email: mail@mail.ru
+  phone: +7 903 666-44-55
+  subtitle: Рассказы разработчиков
+  title: DevPub
