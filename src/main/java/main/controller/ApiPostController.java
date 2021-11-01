@@ -1,15 +1,13 @@
 package main.controller;
 
-import main.api.response.PostResponse;
-import main.mapper.PostMapper;
+import main.api.response.BadResponse;
 import main.service.PostService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 /**
  * The type Api post controller.
@@ -21,21 +19,14 @@ public class ApiPostController {
      * The Post service.
      */
     private final PostService postService;
-    /**
-     * The Post mapper.
-     */
-    private final PostMapper postMapper;
 
     /**
      * Instantiates a new Api post controller.
      *
      * @param postServices the post service
-     * @param postMappers  the post mapper
      */
-    public ApiPostController(final PostService postServices,
-                             final PostMapper postMappers) {
+    public ApiPostController(final PostService postServices) {
         this.postService = postServices;
-        this.postMapper = postMappers;
     }
 
     /**
@@ -47,11 +38,35 @@ public class ApiPostController {
      * @return the response entity
      */
     @GetMapping("/post")
-    public ResponseEntity<List<PostResponse.PostDTO>> findAll(
+    private Object findRecentPost(
             final @RequestParam(defaultValue = "0") int offset,
             final @RequestParam(defaultValue = "10") int limit,
             final @RequestParam(defaultValue = "recent") String mode) {
-        return ResponseEntity.ok(
-                postMapper.toPostDTOs(postService.getPostResponse()));
+        boolean isModeValid = mode.equals("recent") || mode.equals("popular")
+                || mode.equals("best") || mode.equals("early");
+        if (offset < 0 || limit < 1 || !isModeValid) {
+            return new ResponseEntity<>(new BadResponse(
+                    offset < 0 ? "Передан отрицательный параметр сдвига" : "",
+                    limit < 1 ? "Ограничение количества "
+                            + "отображаемых постов менее 1" : "",
+                    !isModeValid ? "Режим отображения не распознан" : ""),
+                    HttpStatus.BAD_REQUEST);
+        }
+        switch (mode) {
+            case "recent":
+                return ResponseEntity.ok((postService
+                        .getRecentPost(offset, limit)));
+            case "popular":
+                return ResponseEntity.ok(postService
+                        .getPopularPost(offset, limit));
+            case "best":
+                return ResponseEntity.ok(postService
+                        .getBestPost(offset, limit));
+            case "early":
+                return ResponseEntity.ok(postService
+                        .getEarlyPost(offset, limit));
+            default:
+                return ResponseEntity.status(HttpStatus.NOT_FOUND);
+        }
     }
 }

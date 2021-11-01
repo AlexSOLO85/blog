@@ -1,4 +1,4 @@
 package main.mapper;
 
-public interface AuthMapper {
+public abstract class AuthMapper {
 }

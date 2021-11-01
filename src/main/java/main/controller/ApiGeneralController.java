@@ -5,8 +5,10 @@ import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
 import main.service.SettingsService;
 import main.service.TagService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -43,18 +45,35 @@ public class ApiGeneralController {
         this.tagService = tagServices;
     }
 
+    /**
+     * Init response init response.
+     *
+     * @return the init response
+     */
     @GetMapping("/init")
-    private InitResponse initResponse() {
-        return initResponse;
+    private ResponseEntity<InitResponse> initResponse() {
+        return ResponseEntity.ok(initResponse);
     }
 
+    /**
+     * Sets response.
+     *
+     * @return the response
+     */
     @GetMapping("/settings")
-    private SettingsResponse settingsResponse() {
-        return settingsService.getGlobalSettings();
+    private ResponseEntity<SettingsResponse> settingsResponse() {
+        return ResponseEntity.ok(settingsService.getGlobalSettings());
     }
 
+    /**
+     * Tag response response entity.
+     *
+     * @param query the query
+     * @return the response entity
+     */
     @GetMapping("/tag")
-    private TagResponse tagResponse() {
-        return tagService.getTagResponse();
+    private ResponseEntity<TagResponse> tagResponse(
+            final @RequestParam(defaultValue = "") String query) {
+        return ResponseEntity.ok((tagService.getTagWithQueryResponse(query)));
     }
 }

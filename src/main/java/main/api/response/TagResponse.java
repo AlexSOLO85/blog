@@ -3,6 +3,7 @@ package main.api.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
@@ -12,11 +13,12 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Component
 public class TagResponse {
     /**
-     * The Tags.
+     * The Tag.
      */
-    private List<Tag> tags;
+    private List<Tags> tags;
 
     /**
      * The type Tag.
@@ -24,7 +26,7 @@ public class TagResponse {
     @Data
     @AllArgsConstructor
     @RequiredArgsConstructor
-    public static class Tag {
+    public static class Tags {
         /**
          * The Name.
          */

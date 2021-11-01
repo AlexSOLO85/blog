@@ -42,7 +42,7 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_post_comments"/>
             </column>
-            <column name="parent_id" type="INT">
+            <column name="parent_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
             <column name="post_id" type="BIGINT">
@@ -109,11 +109,14 @@
     </changeSet>
     <changeSet id="1.6" author="Alexander">
         <createTable tableName="tag2post">
-            <column name="post_id" type="BIGINT">
+            <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag2post"/>
             </column>
             <column name="tag_id" type="BIGINT">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_tag2post"/>
+                <constraints nullable="false"/>
+            </column>
+            <column name="post_id" type="BIGINT">
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
@@ -156,31 +159,37 @@
                                  referencedColumnNames="id" referencedTableName="users"/>
     </changeSet>
     <changeSet id="1.10" author="Alexander">
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="post_comments"
+                                 constraintName="FK_POST_COMMENTS_ON_PARENT" referencedColumnNames="id"
+                                 referencedTableName="post_comments"/>
+    </changeSet>
+    <changeSet id="1.11" author="Alexander">
         <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="post_comments"
                                  constraintName="FK_POST_COMMENTS_ON_POST" referencedColumnNames="id"
                                  referencedTableName="posts"/>
     </changeSet>
-    <changeSet id="1.11" author="Alexander">
+    <changeSet id="1.12" author="Alexander">
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="post_comments"
                                  constraintName="FK_POST_COMMENTS_ON_USER" referencedColumnNames="id"
                                  referencedTableName="users"/>
     </changeSet>
-    <changeSet id="1.12" author="Alexander">
+    <changeSet id="1.13" author="Alexander">
         <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="post_votes"
                                  constraintName="FK_POST_VOTES_ON_POST" referencedColumnNames="id"
                                  referencedTableName="posts"/>
     </changeSet>
-    <changeSet id="1.13" author="Alexander">
+    <changeSet id="1.14" author="Alexander">
         <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="post_votes"
                                  constraintName="FK_POST_VOTES_ON_USER" referencedColumnNames="id"
                                  referencedTableName="users"/>
     </changeSet>
-    <changeSet id="1.14" author="Alexander">
-        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="tag2post" constraintName="fk_tag2post_on_posts"
+    <changeSet id="1.15" author="Alexander">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="tag2post" constraintName="FK_TAG2POST_ON_POST"
                                  referencedColumnNames="id" referencedTableName="posts"/>
     </changeSet>
-    <changeSet id="1.15" author="Alexander">
-        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="tag2post" constraintName="fk_tag2post_on_tags"
+    <changeSet id="1.16" author="Alexander">
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="tag2post" constraintName="FK_TAG2POST_ON_TAG"
                                  referencedColumnNames="id" referencedTableName="tags"/>
     </changeSet>
+
 </databaseChangeLog>

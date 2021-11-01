@@ -6,10 +6,10 @@
                       https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.3.xsd">
     <include file="db/changelog/changes/1_create_all_table.xml"/>
     <include file="db/changelog/changes/2_update_global_settings_table.xml"/>
-    <include file="db/changelog/changes/3_update_table_post_comments.xml"/>
-    <include file="db/changelog/changes/4_update_users_table.xml"/>
-    <include file="db/changelog/changes/5_update_posts_table.xml"/>
-    <include file="db/changelog/changes/6_update_post_votes_table.xml"/>
-    <include file="db/changelog/changes/7_update_tags_table.xml"/>
-    <include file="db/changelog/changes/8_update_post_comments_table.xml"/>
+    <include file="db/changelog/changes/3_update_users_table.xml"/>
+    <include file="db/changelog/changes/4_update_posts_table.xml"/>
+    <include file="db/changelog/changes/5_update_post_votes_table.xml"/>
+    <include file="db/changelog/changes/6_update_tags_table.xml"/>
+    <include file="db/changelog/changes/7_update_post_comments_table.xml"/>
+    <include file="db/changelog/changes/8_update_tag2post_table.xml"/>
 </databaseChangeLog>

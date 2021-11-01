@@ -1,5 +1,6 @@
 package main.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.GenerationType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
+import javax.persistence.CascadeType;
 import java.util.List;
 
 /**
- * The type Tags.
+ * The type Tag.
  */
 @Data
 @AllArgsConstructor
@@ -25,7 +25,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "tags")
-public class Tags {
+public class Tag {
     /**
      * The Id.
      */
@@ -33,22 +33,17 @@ public class Tags {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
     /**
      * The Name.
      */
     @Column(name = "name", nullable = false)
     private String name;
-
     /**
-     * The Posts.
+     * The Tag to posts.
      */
-    @ManyToMany
-    @JoinTable(name = "tag2post",
-            joinColumns = @JoinColumn(
-                    name = "post_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(
-                    name = "tag_id", referencedColumnName = "id"))
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonIgnore
     @ToString.Exclude
-    private List<Post> posts;
+    private List<TagToPost> tagsToPosts;
 }

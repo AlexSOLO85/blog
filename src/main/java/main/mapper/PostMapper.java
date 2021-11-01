@@ -11,8 +11,8 @@ import java.util.List;
 /**
  * The interface Post mapper.
  */
-@Mapper(componentModel = "spring", uses = LocalTimeMapper.class)
-public interface PostMapper {
+@Mapper(componentModel = "spring", uses = {LocalTimeMapper.class})
+public abstract class PostMapper {
     /**
      * To post dto post response . post.
      *
@@ -21,8 +21,15 @@ public interface PostMapper {
      */
     @Mapping(target = "announce", source = "post.text")
     @Mapping(target = "timestamp", source = "post.time")
-    @Mapping(target = "post.postVotes", ignore = true)
-    PostResponse.PostDTO toPostDTO(Post post);
+    @Mapping(target = "commentCount",
+            expression = "java(post.getPostComments().size())")
+    @Mapping(target = "likeCount",
+            expression = "java((int) post.getPostVotes().stream()"
+                    + ".filter(p -> p.getValue() > 0).count())")
+    @Mapping(target = "dislikeCount",
+            expression = "java((int) post.getPostVotes().stream()"
+                    + ".filter(p -> p.getValue() < 0).count())")
+    public abstract PostResponse.PostDTO toPostDTO(Post post);
 
     /**
      * To post.
@@ -30,7 +37,7 @@ public interface PostMapper {
      * @param postResponseDTO the post response dto
      * @return the post
      */
-    Post toPost(PostResponse.PostDTO postResponseDTO);
+    public abstract Post toPost(PostResponse.PostDTO postResponseDTO);
 
     /**
      * To post dt os list.
@@ -38,5 +45,5 @@ public interface PostMapper {
      * @param posts the posts
      * @return the list
      */
-    List<PostResponse.PostDTO> toPostDTOs(List<Post> posts);
+    public abstract List<PostResponse.PostDTO> toPostDTOs(List<Post> posts);
 }

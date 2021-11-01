@@ -1,4 +1,4 @@
 package main.mapper;
 
-public interface SettingsMapper {
+public abstract class SettingsMapper {
 }

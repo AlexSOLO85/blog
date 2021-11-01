@@ -2,7 +2,7 @@ package main.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -10,18 +10,20 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.GenerationType;
+import javax.persistence.ManyToOne;
+import javax.persistence.JoinColumn;
 import java.time.LocalDateTime;
 
 /**
- * The type Captcha codes.
+ * The type Post votes.
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 
 @Entity
-@Table(name = "captcha_codes")
-public class CaptchaCodes {
+@Table(name = "post_votes")
+public class PostVote {
     /**
      * The Id.
      */
@@ -29,22 +31,26 @@ public class CaptchaCodes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-
+    /**
+     * The User.
+     */
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    /**
+     * The Post.
+     */
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
     /**
      * The Time.
      */
     @Column(name = "time", nullable = false)
     private LocalDateTime time;
-
     /**
-     * The Code.
+     * The Value.
      */
-    @Column(name = "code", nullable = false)
-    private String code;
-
-    /**
-     * The Secret code.
-     */
-    @Column(name = "secret_code", nullable = false)
-    private String secretCode;
+    @Column(name = "value", nullable = false, columnDefinition = "SMALLINT")
+    private byte value;
 }

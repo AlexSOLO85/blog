@@ -2,25 +2,27 @@ package main.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.persistence.Column;
 import javax.persistence.GenerationType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
- * The type Global settings.
+ * The type Tag to post.
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
+@RequiredArgsConstructor
 
 @Entity
-@Table(name = "global_settings")
-public class GlobalSettings {
+@Table(name = "tag2post")
+public class TagToPost {
     /**
      * The Id.
      */
@@ -29,18 +31,15 @@ public class GlobalSettings {
     @Column(name = "id", nullable = false)
     private Long id;
     /**
-     * The Code.
+     * The Tag.
      */
-    @Column(name = "code", nullable = false)
-    private String code;
+    @ManyToOne
+    @JoinColumn(name = "tag_id", nullable = false)
+    private Tag tag;
     /**
-     * The Name.
+     * The Post.
      */
-    @Column(name = "name", nullable = false)
-    private String name;
-    /**
-     * The Value.
-     */
-    @Column(name = "value", nullable = false)
-    private String value;
+    @ManyToOne
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 }
