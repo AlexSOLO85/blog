@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class AuthResponse {
-    private boolean result;
+public class CaptchaResponse {
+    private String secret;
+    private String image;
 }

@@ -1,34 +1,20 @@
-package main.service;
+package main.services;
 
 import main.api.response.SettingsResponse;
 import main.repository.SettingsRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-/**
- * The type Settings service.
- */
 @Service
 public class SettingsService {
-    /**
-     * The Settings repository.
-     */
     private final SettingsRepository settingsRepository;
 
-    /**
-     * Instantiates a new Settings service.
-     *
-     * @param settingsRepositoryParam the settings repository
-     */
     public SettingsService(final SettingsRepository settingsRepositoryParam) {
         this.settingsRepository = settingsRepositoryParam;
     }
 
-    /**
-     * Gets global settings.
-     *
-     * @return the global settings
-     */
-    public SettingsResponse getGlobalSettings() {
+    public final ResponseEntity<SettingsResponse> getGlobalSettings() {
         SettingsResponse settingsResponse = new SettingsResponse();
         settingsResponse.setMultiuserMode(
                 settingsRepository.getMultiUserMode());
@@ -36,6 +22,6 @@ public class SettingsService {
                 settingsRepository.getStatisticsIsPublic());
         settingsResponse.setPostPremoderation(
                 settingsRepository.getPostPremoderation());
-        return settingsResponse;
+        return new ResponseEntity<>(settingsResponse, HttpStatus.OK);
     }
 }

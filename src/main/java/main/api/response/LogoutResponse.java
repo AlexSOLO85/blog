@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class AuthResponse {
+public class LogoutResponse {
     private boolean result;
 }

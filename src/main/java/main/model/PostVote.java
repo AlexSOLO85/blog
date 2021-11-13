@@ -1,8 +1,8 @@
 package main.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,43 +14,25 @@ import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 import java.time.LocalDateTime;
 
-/**
- * The type Post votes.
- */
 @Data
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 
 @Entity
 @Table(name = "post_votes")
 public class PostVote {
-    /**
-     * The Id.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    /**
-     * The User.
-     */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    /**
-     * The Post.
-     */
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
-    /**
-     * The Time.
-     */
     @Column(name = "time", nullable = false)
     private LocalDateTime time;
-    /**
-     * The Value.
-     */
     @Column(name = "value", nullable = false, columnDefinition = "SMALLINT")
     private byte value;
 }

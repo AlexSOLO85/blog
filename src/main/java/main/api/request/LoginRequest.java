@@ -1,5 +1,6 @@
-package main.api.response;
+package main.api.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class AuthResponse {
-    private boolean result;
+public class LoginRequest {
+    @JsonProperty("e_mail")
+    private String email;
+    private String password;
 }

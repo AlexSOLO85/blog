@@ -5,20 +5,22 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class TagResponse {
-    private List<Tags> tags;
+public class RegisterResponse {
+    private boolean result;
+    private ErrorResponse errors;
 
     @Data
     @AllArgsConstructor
     @RequiredArgsConstructor
-    public static class Tags {
+    @Component
+    public static class ErrorResponse {
+        private String email;
         private String name;
-        private double weight;
+        private String password;
+        private String captcha;
     }
 }
