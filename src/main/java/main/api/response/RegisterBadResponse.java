@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class RegisterResponse {
+public class RegisterBadResponse {
     private boolean result;
     private ErrorResponse errors;
 

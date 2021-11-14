@@ -45,3 +45,9 @@ user:
     validation_regex: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}"
   name:
     validation_regex: "^[а-яА-ЯёЁa-zA-Z]+$"
+
+post:
+  title:
+    min_length: 3
+  text:
+    min_length: 150

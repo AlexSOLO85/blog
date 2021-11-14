@@ -10,8 +10,8 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {LocalTimeMapper.class})
 public interface PostsMyDTO {
-    @Mapping(target = "announce", source = "post.text")
-    @Mapping(target = "timestamp", source = "post.time")
+    @Mapping(target = "announce", source = "text")
+    @Mapping(target = "timestamp", source = "time")
     @Mapping(target = "commentCount",
             expression = "java(post.getPostComments().size())")
     @Mapping(target = "likeCount",

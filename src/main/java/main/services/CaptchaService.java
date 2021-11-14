@@ -8,7 +8,7 @@ import com.github.cage.image.RgbColorGenerator;
 import com.github.cage.token.RandomTokenGenerator;
 import lombok.SneakyThrows;
 import main.api.response.CaptchaResponse;
-import main.mapper.CaptchaDTO;
+import main.utils.SaveToEntity;
 import main.model.CaptchaCode;
 import main.repository.CaptchaRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,14 +53,14 @@ public class CaptchaService {
     @Value("${captcha.image.height}")
     private int captchaImageHeight;
     private final CaptchaRepository captchaRepository;
-    private final CaptchaDTO captchaDTO;
+    private final SaveToEntity saveToEntity;
     private final CaptchaResponse captchaResponse;
 
     public CaptchaService(final CaptchaRepository captchaRepositoryParam,
-                          final CaptchaDTO captchaDTOParam,
+                          final SaveToEntity saveToEntityParam,
                           final CaptchaResponse captchaResponseParam) {
         this.captchaRepository = captchaRepositoryParam;
-        this.captchaDTO = captchaDTOParam;
+        this.saveToEntity = saveToEntityParam;
         this.captchaResponse = captchaResponseParam;
     }
 
@@ -78,7 +78,7 @@ public class CaptchaService {
         byte[] encodedBytes = Base64.getEncoder().encode(cage.draw(token));
         String captchaImageBase64String = captchaFormatString + ", "
                 + new String(encodedBytes, StandardCharsets.UTF_8);
-        CaptchaCode newCaptcha = captchaDTO
+        CaptchaCode newCaptcha = saveToEntity
                 .captchaCodeToEntity(LocalDateTime.now(), token, secretCode);
         captchaRepository.save(newCaptcha);
         captchaResponse.setSecret(secretCode);

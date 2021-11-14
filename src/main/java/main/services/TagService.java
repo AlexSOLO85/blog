@@ -2,6 +2,7 @@ package main.services;
 
 import main.api.response.TagResponse;
 import main.mapper.TagDTO;
+import main.model.Tag;
 import main.repository.TagRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,14 @@ public class TagService {
             tagResponse.setTags(tagDTO.toTagDTOs(tagRepository
                     .getAllTagsListByQuerySortedByIdDesc(query)));
             return new ResponseEntity<>(tagResponse, HttpStatus.OK);
+        }
+    }
+
+    public final Tag addTag(final Tag tag) {
+        if (tag == null) {
+            return null;
+        } else {
+            return tagRepository.save(tag);
         }
     }
 }

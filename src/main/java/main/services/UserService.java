@@ -2,8 +2,8 @@ package main.services;
 
 import main.api.request.RegisterRequest;
 import main.api.response.AuthResponse;
-import main.api.response.RegisterResponse;
-import main.mapper.UserDTO;
+import main.api.response.RegisterBadResponse;
+import main.utils.SaveToEntity;
 import main.model.CaptchaCode;
 import main.model.User;
 import main.repository.CaptchaRepository;
@@ -24,23 +24,14 @@ public class UserService {
     private String nameValidationRegex;
     private final UserRepository userRepository;
     private final CaptchaRepository captchaRepository;
-    private final UserDTO userDTO;
-    private final RegisterResponse registerResponse;
-    private final RegisterResponse.ErrorResponse error;
-    private final AuthResponse authResponse;
+    private final SaveToEntity saveToEntity;
 
     public UserService(final UserRepository userRepositoryParam,
                        final CaptchaRepository captchaRepositoryParam,
-                       final UserDTO userDTOParam,
-                       final RegisterResponse registerResponseParam,
-                       final RegisterResponse.ErrorResponse errorParam,
-                       final AuthResponse authResponseParam) {
+                       final SaveToEntity saveToEntityParam) {
         this.userRepository = userRepositoryParam;
         this.captchaRepository = captchaRepositoryParam;
-        this.userDTO = userDTOParam;
-        this.registerResponse = registerResponseParam;
-        this.error = errorParam;
-        this.authResponse = authResponseParam;
+        this.saveToEntity = saveToEntityParam;
     }
 
     public final User getUser(final String name) {
@@ -49,30 +40,35 @@ public class UserService {
 
     public final ResponseEntity<?> register(
             final RegisterRequest registerRequest) {
+        AuthResponse authResponse = new AuthResponse();
         String email = registerRequest.getEmail();
         String password = registerRequest.getPassword();
         String name = registerRequest.getName();
         String captcha = registerRequest.getCaptcha();
         String captchaSecret = registerRequest.getCaptchaSecret();
-        ResponseEntity<RegisterResponse> response
+        ResponseEntity<RegisterBadResponse> response
                 = badResponse(email, password, name, captcha, captchaSecret);
         if (response != null) {
             return response;
         }
         String hashedPassword = passwordEncoder(password);
-        User user = userDTO.userToEntity(false, LocalDateTime.now(),
+        User user = saveToEntity.userToEntity(false, LocalDateTime.now(),
                 name, email, hashedPassword);
         userRepository.save(user);
         authResponse.setResult(true);
         return new ResponseEntity<>(authResponse, HttpStatus.OK);
     }
 
-    private ResponseEntity<RegisterResponse> badResponse(
+    private ResponseEntity<RegisterBadResponse> badResponse(
             final String email,
             final String password,
             final String name,
             final String captcha,
             final String captchaSecret) {
+        RegisterBadResponse registerBadResponse
+                = new RegisterBadResponse();
+        RegisterBadResponse.ErrorResponse error
+                = new RegisterBadResponse.ErrorResponse();
         boolean isUserExistsByEmail = userRepository
                 .getUserByEmail(email.toLowerCase()) != null;
         boolean isNameValid = isNameValid(name);
@@ -80,30 +76,30 @@ public class UserService {
         boolean isCaptchaCodeValid = isCaptchaValid(captcha, captchaSecret);
         if (isUserExistsByEmail) {
             error.setEmail("Этот e-mail уже зарегистрирован");
-            registerResponse.setResult(false);
-            registerResponse.setErrors(error);
-            return new ResponseEntity<>(registerResponse,
+            registerBadResponse.setResult(false);
+            registerBadResponse.setErrors(error);
+            return new ResponseEntity<>(registerBadResponse,
                     HttpStatus.BAD_REQUEST);
         }
         if (!isNameValid) {
             error.setName("Имя указано неверно");
-            registerResponse.setResult(false);
-            registerResponse.setErrors(error);
-            return new ResponseEntity<>(registerResponse,
+            registerBadResponse.setResult(false);
+            registerBadResponse.setErrors(error);
+            return new ResponseEntity<>(registerBadResponse,
                     HttpStatus.BAD_REQUEST);
         }
         if (!isPassValid) {
             error.setPassword("Пароль короче 6-ти символов");
-            registerResponse.setResult(false);
-            registerResponse.setErrors(error);
-            return new ResponseEntity<>(registerResponse,
+            registerBadResponse.setResult(false);
+            registerBadResponse.setErrors(error);
+            return new ResponseEntity<>(registerBadResponse,
                     HttpStatus.BAD_REQUEST);
         }
         if (!isCaptchaCodeValid) {
             error.setCaptcha("Код с картинки введён неверно");
-            registerResponse.setResult(false);
-            registerResponse.setErrors(error);
-            return new ResponseEntity<>(registerResponse,
+            registerBadResponse.setResult(false);
+            registerBadResponse.setErrors(error);
+            return new ResponseEntity<>(registerBadResponse,
                     HttpStatus.BAD_REQUEST);
         }
         return null;

@@ -49,4 +49,12 @@ public interface TagRepository extends PagingAndSortingRepository<Tag, Long> {
             + "AS max_tag_count",
             nativeQuery = true)
     Integer getMaxTagCount();
+
+    @Query(
+            value =
+                    "SELECT * "
+                            + "FROM tags t "
+                            + "WHERE t.name = ?",
+            nativeQuery = true)
+    Tag getTagByTagName(String currentTagName);
 }

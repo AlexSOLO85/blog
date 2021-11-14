@@ -1,9 +1,11 @@
 package main.controller;
 
+import main.api.request.PostAddRequest;
 import main.api.response.PostResponse;
 import main.api.response.PostsMyResponse;
 import main.api.response.PostsResponse;
 import main.model.User;
+import main.services.PostAddService;
 import main.services.PostService;
 import main.services.PostsService;
 import main.services.UserService;
@@ -13,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,13 +27,16 @@ public class ApiPostController {
     private final PostsService postsService;
     private final PostService postService;
     private final UserService userService;
+    private final PostAddService postAddService;
 
     public ApiPostController(final PostsService postsServices,
                              final PostService postServices,
-                             final UserService userServices) {
+                             final UserService userServices,
+                             final PostAddService postAddServices) {
         this.postsService = postsServices;
         this.postService = postServices;
         this.userService = userServices;
+        this.postAddService = postAddServices;
     }
 
     @GetMapping(value = "/post", params = {"offset", "limit", "mode"})
@@ -113,5 +120,14 @@ public class ApiPostController {
             return new ResponseEntity<>("user not moderator",
                     HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @PostMapping(value = "/post")
+    public final ResponseEntity<?> addPost(
+            final @RequestBody PostAddRequest postAddRequest) {
+        Authentication loggedInUser = SecurityContextHolder.getContext()
+                .getAuthentication();
+        User user = userService.getUser(loggedInUser.getName());
+        return postAddService.addPost(postAddRequest, user);
     }
 }
