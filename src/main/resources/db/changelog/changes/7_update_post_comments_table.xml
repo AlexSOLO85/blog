@@ -11,7 +11,6 @@
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-19 20:59:03"/>
             <column name="text" value="Отлично!"/>
-            <column name="parent_id" value="1"/>
         </insert>
     </changeSet>
     <changeSet id="7.2" author="Alexander">
@@ -20,7 +19,6 @@
             <column name="user_id" value="2"/>
             <column name="time" value="2021-10-19 20:59:03"/>
             <column name="text" value="Отлично!!!"/>
-            <column name="parent_id" value="1"/>
         </insert>
     </changeSet>
     <changeSet id="7.3" author="Alexander">
@@ -29,7 +27,6 @@
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-19 20:59:03"/>
             <column name="text" value="Хорошо"/>
-            <column name="parent_id" value="2"/>
         </insert>
     </changeSet>
     <changeSet id="7.4" author="Alexander">
@@ -38,7 +35,6 @@
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-19 20:59:03"/>
             <column name="text" value="Хорошо!"/>
-            <column name="parent_id" value="2"/>
         </insert>
     </changeSet>
     <changeSet id="7.5" author="Alexander">
@@ -47,7 +43,6 @@
             <column name="user_id" value="2"/>
             <column name="time" value="2021-10-19 20:59:03"/>
             <column name="text" value="Больше инфы"/>
-            <column name="parent_id" value="1"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

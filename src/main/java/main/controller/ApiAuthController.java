@@ -1,10 +1,13 @@
 package main.controller;
 
+import lombok.RequiredArgsConstructor;
+import main.api.request.ChangePassRequest;
 import main.api.request.LoginRequest;
 import main.api.request.RegisterRequest;
+import main.api.request.RestorePassRequest;
+import main.api.response.BooleanResponse;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
-import main.api.response.LogoutResponse;
 import main.services.CaptchaService;
 import main.services.LoginService;
 import main.services.LogoutService;
@@ -21,23 +24,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.security.Principal;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class ApiAuthController {
     private final CaptchaService captchaService;
     private final UserService userService;
     private final LoginService loginService;
     private final LogoutService logoutService;
-
-    public ApiAuthController(final CaptchaService captchaServiceParam,
-                             final UserService userServiceParam,
-                             final LoginService loginServiceParam,
-                             final LogoutService logoutServiceParam) {
-        this.captchaService = captchaServiceParam;
-        this.userService = userServiceParam;
-        this.loginService = loginServiceParam;
-        this.logoutService = logoutServiceParam;
-    }
-
     @GetMapping("/check")
     public final ResponseEntity<?> authCheckResponse(
             final Principal principal) {
@@ -62,9 +55,21 @@ public class ApiAuthController {
     }
 
     @GetMapping("/logout")
-    public final ResponseEntity<LogoutResponse> logout(
+    public final ResponseEntity<BooleanResponse> logout(
             final HttpServletRequest request,
             final HttpServletResponse response) {
         return logoutService.logout(request, response);
+    }
+
+    @PostMapping("/restore")
+    public final ResponseEntity<?> restorePassword(
+            final @RequestBody RestorePassRequest restorePassRequest) {
+        return userService.restorePassword(restorePassRequest);
+    }
+
+    @PostMapping("/password")
+    public final ResponseEntity<?> changePassword(
+            final @RequestBody ChangePassRequest changePassRequest) {
+        return userService.changePassword(changePassRequest);
     }
 }

@@ -14,6 +14,25 @@ spring:
           format_sql: true
           dialect: org.hibernate.dialect.MySQL8Dialect
           ddl-auto: validate
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username:
+    password:
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+        debug: true
 
 blog:
   copyright: Дмитрий Сергеев
@@ -41,13 +60,27 @@ captcha:
 user:
   password:
     validation_regex: "^.{6,}$"
-  email:
-    validation_regex: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}"
+    restore_pass_message_string: "/login/change-password/"
+    restore_message_subject: "Ссылка для восстановление пароля"
   name:
     validation_regex: "^[а-яА-ЯёЁa-zA-Z]+$"
+  image:
+    upload_folder: upload
+    avatars_folder: avatars
+    avatars_width_size: 36
+    avatars_height_size: 36
+    format: jpg
+    max_size: 5000000 # bytes
 
 post:
   title:
     min_length: 3
   text:
     min_length: 150
+  image:
+    root_folder: images
+    upload_folder: upload
+    format: jpg
+
+post_comment:
+  min_length: 10

@@ -10,9 +10,10 @@
             <column name="id" value="1"/>
             <column name="is_moderator" valueBoolean="true"/>
             <column name="reg_time" value="2021-09-19 19:57:03"/>
-            <column name="name" value="Иванов Иван"/>
-            <column name="email" value="mail@mail.ru"/>
-            <column name="password" value="5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"/>
+            <column name="name" value="Модератор"/>
+            <column name="email" value="mail1@mail.ru"/>
+            <column name="password" value="$2a$12$lgDgxiAS7Mxis9uxOFEfuuzWQ8tblug1jNW9zq91YkRsf3nVYBzwq"/>
+            <column name="photo" value="src/main/resources/static/default-1.png"/>
         </insert>
     </changeSet>
     <changeSet id="3.2" author="Alexander">
@@ -20,9 +21,10 @@
             <column name="id" value="2"/>
             <column name="is_moderator" valueBoolean="false"/>
             <column name="reg_time" value="2020-09-20 19:57:03"/>
-            <column name="name" value="Петров Петр"/>
+            <column name="name" value="Пользователь"/>
             <column name="email" value="mail2@mail.ru"/>
-            <column name="password" value="5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8"/>
+            <column name="password" value="$2a$12$lgDgxiAS7Mxis9uxOFEfuuzWQ8tblug1jNW9zq91YkRsf3nVYBzwq"/>
+            <column name="photo" value="src/main/resources/static/default-1.png"/>
         </insert>
     </changeSet>
 </databaseChangeLog>

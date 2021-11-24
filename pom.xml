@@ -104,6 +104,10 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.26</version>
@@ -142,11 +146,6 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>20030203.000550</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.mifmif</groupId>
-            <artifactId>generex</artifactId>
-            <version>1.0.2</version>
         </dependency>
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>

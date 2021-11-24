@@ -32,7 +32,7 @@
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="value" type="VARCHAR(255)" defaultValue="NO">
+            <column name="value" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -42,9 +42,7 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_post_comments"/>
             </column>
-            <column name="parent_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
+            <column name="parent_id" type="BIGINT"/>
             <column name="post_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -54,7 +52,7 @@
             <column name="time" type="DATETIME">
                 <constraints nullable="false"/>
             </column>
-            <column name="text" type="VARCHAR(255)">
+            <column name="text" type="TEXT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -99,7 +97,7 @@
             <column name="title" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="text" type="VARCHAR(255)">
+            <column name="text" type="TEXT">
                 <constraints nullable="false"/>
             </column>
             <column name="view_count" type="INT">

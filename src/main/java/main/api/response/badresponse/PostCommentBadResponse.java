@@ -1,4 +1,4 @@
-package main.api.response;
+package main.api.response.badresponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,16 +9,15 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class PostAddBadResponse {
+public class PostCommentBadResponse {
     private boolean result;
-    private ErrorResponse errors;
+    private Errors errors;
 
     @Data
     @AllArgsConstructor
     @RequiredArgsConstructor
     @Component
-    public static class ErrorResponse {
-        private String title;
+    public static class Errors {
         private String text;
     }
 }

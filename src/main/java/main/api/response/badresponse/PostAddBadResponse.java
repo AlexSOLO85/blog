@@ -1,4 +1,4 @@
-package main.api.response;
+package main.api.response.badresponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,18 +9,16 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class RegisterBadResponse {
+public class PostAddBadResponse {
     private boolean result;
-    private ErrorResponse errors;
+    private Errors errors;
 
     @Data
     @AllArgsConstructor
     @RequiredArgsConstructor
     @Component
-    public static class ErrorResponse {
-        private String email;
-        private String name;
-        private String password;
-        private String captcha;
+    public static class Errors {
+        private String title;
+        private String text;
     }
 }

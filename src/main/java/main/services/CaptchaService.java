@@ -6,6 +6,7 @@ import com.github.cage.image.EffectConfig;
 import com.github.cage.image.Painter;
 import com.github.cage.image.RgbColorGenerator;
 import com.github.cage.token.RandomTokenGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import main.api.response.CaptchaResponse;
 import main.utils.SaveToEntity;
@@ -25,13 +26,8 @@ import java.util.Base64;
 import java.util.Random;
 
 @Service
+@RequiredArgsConstructor
 public class CaptchaService {
-    private static final int UNICODE_NUMERAL_0 = 48;
-    private static final int UNICODE_NUMERAL_9 = 57;
-    private static final int UNICODE_LETTER_Z_LOWERCASE = 122;
-    private static final int UNICODE_LETTER_Z_UPPERCASE = 90;
-    private static final int UNICODE_LETTER_A_UPPERCASE = 65;
-    private static final int UNICODE_LETTER_A_LOWERCASE = 97;
     @Value("${captcha.delete_timeout}")
     private int oldCaptchaDeleteTimeInMin;
     @Value("${captcha.random_secret_key_length}")
@@ -52,17 +48,15 @@ public class CaptchaService {
     private int captchaImageWidth;
     @Value("${captcha.image.height}")
     private int captchaImageHeight;
+    private static final int UNICODE_NUMERAL_0 = 48;
+    private static final int UNICODE_NUMERAL_9 = 57;
+    private static final int UNICODE_LETTER_Z_LOWERCASE = 122;
+    private static final int UNICODE_LETTER_Z_UPPERCASE = 90;
+    private static final int UNICODE_LETTER_A_UPPERCASE = 65;
+    private static final int UNICODE_LETTER_A_LOWERCASE = 97;
     private final CaptchaRepository captchaRepository;
     private final SaveToEntity saveToEntity;
     private final CaptchaResponse captchaResponse;
-
-    public CaptchaService(final CaptchaRepository captchaRepositoryParam,
-                          final SaveToEntity saveToEntityParam,
-                          final CaptchaResponse captchaResponseParam) {
-        this.captchaRepository = captchaRepositoryParam;
-        this.saveToEntity = saveToEntityParam;
-        this.captchaResponse = captchaResponseParam;
-    }
 
     public final ResponseEntity<CaptchaResponse> generateCaptcha() {
         LocalDateTime captchaDeleteBeforeTime =

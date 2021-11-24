@@ -4,6 +4,7 @@ import main.model.Post;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
@@ -278,4 +279,31 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
                             + "AS searched_posts",
             nativeQuery = true)
     int countPostsModeratedByMe(String moderationStatus, int id);
+
+    @Query(
+            value =
+                    "SELECT count(id) "
+                            + "AS count "
+                            + "FROM posts",
+            nativeQuery = true)
+    int countAllPostsAtDatabase();
+
+    @Query(
+            value =
+                    "SELECT sum(p.view_count) "
+                            + "AS views "
+                            + "FROM posts p",
+            nativeQuery = true)
+    int countAllViews();
+
+    @Query(
+            value =
+                    "SELECT p.time "
+                            + "FROM posts p "
+                            + "WHERE p.is_active = 1 "
+                            + "AND p.moderation_status = 'ACCEPTED' "
+                            + "ORDER BY p.time "
+                            + "ASC LIMIT 1",
+            nativeQuery = true)
+    LocalDateTime getFirstPublicationDate();
 }

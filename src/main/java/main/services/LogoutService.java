@@ -1,6 +1,6 @@
 package main.services;
 
-import main.api.response.LogoutResponse;
+import main.api.response.BooleanResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,20 +13,12 @@ import javax.servlet.http.HttpServletResponse;
 
 @Service
 public class LogoutService {
-    private final LogoutResponse logoutResponse;
-
-    public LogoutService(final LogoutResponse logoutResponseParam) {
-        this.logoutResponse = logoutResponseParam;
-    }
-
-    public final ResponseEntity<LogoutResponse> logout(
+    public final ResponseEntity<BooleanResponse> logout(
             final HttpServletRequest request,
             final HttpServletResponse response) {
         Authentication auth = SecurityContextHolder
                 .getContext().getAuthentication();
         new SecurityContextLogoutHandler().logout(request, response, auth);
-        logoutResponse.setResult(true);
-        return new ResponseEntity<>(logoutResponse,
-                HttpStatus.OK);
+        return new ResponseEntity<>(new BooleanResponse(true), HttpStatus.OK);
     }
 }

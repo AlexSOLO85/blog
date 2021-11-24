@@ -1,4 +1,4 @@
-package main.api.response;
+package main.api.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,6 +9,6 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Component
-public class AuthResponse {
-    private boolean result;
+public class RestorePassRequest {
+    private String email;
 }

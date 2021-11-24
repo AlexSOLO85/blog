@@ -6,10 +6,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 @Component
-public class PostAddSuccessResponse {
+public class BooleanResponse {
     private boolean result;
 }
-

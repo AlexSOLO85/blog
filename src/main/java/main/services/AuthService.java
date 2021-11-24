@@ -1,15 +1,14 @@
 package main.services;
 
-import main.api.response.AuthResponse;
+import main.api.response.BooleanResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
-    public final ResponseEntity<AuthResponse> getAuthCheck() {
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setResult(false);
-        return new ResponseEntity<>(authResponse, HttpStatus.OK);
+    public final ResponseEntity<BooleanResponse> getAuthCheck() {
+        return new ResponseEntity<>(new BooleanResponse(false),
+                HttpStatus.OK);
     }
 }

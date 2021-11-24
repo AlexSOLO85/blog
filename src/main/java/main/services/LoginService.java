@@ -1,5 +1,6 @@
 package main.services;
 
+import lombok.RequiredArgsConstructor;
 import main.api.request.LoginRequest;
 import main.api.response.LoginResponse;
 import main.repository.PostRepository;
@@ -17,21 +18,12 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 
 @Service
+@RequiredArgsConstructor
 public class LoginService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final AuthService authService;
     private final PostRepository postRepository;
-
-    public LoginService(final AuthenticationManager authenticationManagerParam,
-                        final UserRepository userRepositoryParam,
-                        final AuthService authServiceParam,
-                        final PostRepository postRepositoryParam) {
-        this.authenticationManager = authenticationManagerParam;
-        this.userRepository = userRepositoryParam;
-        this.authService = authServiceParam;
-        this.postRepository = postRepositoryParam;
-    }
 
     public final ResponseEntity<LoginResponse> login(
             final LoginRequest loginRequest) {

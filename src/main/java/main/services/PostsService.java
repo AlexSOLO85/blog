@@ -1,5 +1,6 @@
 package main.services;
 
+import lombok.RequiredArgsConstructor;
 import main.api.response.PostsMyResponse;
 import main.api.response.PostsResponse;
 import main.mapper.PostsDTO;
@@ -11,24 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class PostsService {
     private final PostRepository postRepository;
     private final PostsDTO postsDTO;
     private final PostsMyDTO postsMyDTO;
     private final PostsResponse postsResponse;
     private final PostsMyResponse postsMyResponse;
-
-    public PostsService(final PostRepository postRepositoryParam,
-                        final PostsDTO postsDTOParam,
-                        final PostsMyDTO postsMyDTOParam,
-                        final PostsResponse postsResponseParam,
-                        final PostsMyResponse postsMyResponseParam) {
-        this.postRepository = postRepositoryParam;
-        this.postsDTO = postsDTOParam;
-        this.postsMyDTO = postsMyDTOParam;
-        this.postsResponse = postsResponseParam;
-        this.postsMyResponse = postsMyResponseParam;
-    }
 
     public final ResponseEntity<PostsResponse> getRecentPosts(
             final int offset,
@@ -128,13 +118,13 @@ public class PostsService {
             case "declined":
                 postsMyResponse.setCount(
                         postRepository.countMyActivePosts(
-                                ModerationStatus.DECLINE.toString(), userId));
+                                ModerationStatus.DECLINED.toString(), userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
                                 .getMyActivePosts(
                                         offset,
                                         limit,
-                                        ModerationStatus.DECLINE.toString(),
+                                        ModerationStatus.DECLINED.toString(),
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
             case "published":
@@ -172,14 +162,14 @@ public class PostsService {
             case "declined":
                 postsMyResponse.setCount(
                         postRepository.countPostsModeratedByMe(
-                                ModerationStatus.DECLINE.toString(),
+                                ModerationStatus.DECLINED.toString(),
                                 moderateUserId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
                                 .getPostsModeratedByMe(
                                         offset,
                                         limit,
-                                        ModerationStatus.DECLINE.toString(),
+                                        ModerationStatus.DECLINED.toString(),
                                         moderateUserId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
             case "accepted":
