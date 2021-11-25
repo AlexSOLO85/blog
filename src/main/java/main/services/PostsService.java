@@ -98,10 +98,7 @@ public class PostsService {
                                 userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyNotActivePosts(
-                                        offset,
-                                        limit,
-                                        userId)));
+                                .getMyNotActivePosts(offset, limit, userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
             case "pending":
                 postsMyResponse.setCount(
@@ -109,9 +106,7 @@ public class PostsService {
                                 ModerationStatus.NEW.toString(), userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyActivePosts(
-                                        offset,
-                                        limit,
+                                .getMyActivePosts(offset, limit,
                                         ModerationStatus.NEW.toString(),
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
@@ -121,9 +116,7 @@ public class PostsService {
                                 ModerationStatus.DECLINED.toString(), userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyActivePosts(
-                                        offset,
-                                        limit,
+                                .getMyActivePosts(offset, limit,
                                         ModerationStatus.DECLINED.toString(),
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
@@ -133,9 +126,7 @@ public class PostsService {
                                 ModerationStatus.ACCEPTED.toString(), userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyActivePosts(
-                                        offset,
-                                        limit,
+                                .getMyActivePosts(offset, limit,
                                         ModerationStatus.ACCEPTED.toString(),
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);

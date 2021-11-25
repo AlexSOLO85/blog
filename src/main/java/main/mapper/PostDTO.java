@@ -58,12 +58,16 @@ public class PostDTO {
                             commentText);
             comments.add(comment);
         });
+        addTag(post, tags);
+        return postResponse;
+    }
+
+    private void addTag(final Post post, final ArrayList<String> tags) {
         for (TagToPost tagToPost : post.getTagsToPosts()) {
             String tagName = tagToPost.getTag().getName();
             if (!tags.contains(tagName)) {
                 tags.add(tagName);
             }
         }
-        return postResponse;
     }
 }
