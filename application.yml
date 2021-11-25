@@ -4,7 +4,8 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.xml
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+#    url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true
+    url: jdbc:${CLEARDB_DATABASE_URL:mysql://localhost:3306/blog}
     username: root
     password: test
   jpa:
@@ -33,6 +34,9 @@ spring:
           starttls:
             enable: true
         debug: true
+
+server:
+  port: ${PORT:8080}
 
 blog:
   copyright: Дмитрий Сергеев
