@@ -44,8 +44,7 @@ public class PostVoteService {
         }
         Post currentPost = postService.getPostById(postId);
         PostVote beforeLike = postVoteRepository
-                .getPostVoteByUserIdAndPostId(postId,
-                        Math.toIntExact(user.getId()));
+                .getPostVoteByPostIdAndUserId(postId, user.getId());
         if (beforeLike == null) {
             postVoteRepository
                     .save(new SaveToEntity().postVoteToEntity(

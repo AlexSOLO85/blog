@@ -8,7 +8,6 @@ import main.api.request.PostModerateRequest;
 import main.api.request.SettingsRequest;
 import main.api.response.CalendarResponse;
 import main.api.response.InitResponse;
-import main.api.response.SettingsResponse;
 import main.api.response.TagResponse;
 import main.model.User;
 import main.services.CalendarService;
@@ -31,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -49,7 +50,7 @@ public class ApiGeneralController {
     }
 
     @GetMapping("/settings")
-    public final ResponseEntity<SettingsResponse> getSettingsResponse() {
+    public final ResponseEntity<Map<String, Boolean>> getSettingsResponse() {
         return settingsService.getGlobalSettings();
     }
 
@@ -70,7 +71,7 @@ public class ApiGeneralController {
 
     @GetMapping(value = "/calendar", params = {"year"})
     public final ResponseEntity<CalendarResponse> calendarResponse(
-            final @RequestParam(value = "year") Integer year) {
+            final @RequestParam(value = "year") String year) {
         return calendarService.countPostsByYear(year);
     }
 

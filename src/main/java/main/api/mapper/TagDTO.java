@@ -1,4 +1,4 @@
-package main.mapper;
+package main.api.mapper;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,7 +24,9 @@ public abstract class TagDTO {
     @Mapping(target = "weight",
             expression = "java((double) getTagRepository().getTagCountByTagId"
                     + "(Math.toIntExact(tag.getId())) "
-                    + "/ (double) getTagRepository().getMaxTagCount())")
+                    + "/ (double) getTagRepository()"
+                    + ".getMaxTagCount(org.springframework.data.domain"
+                    + ".PageRequest.of(0, 1)))")
     public abstract TagResponse.Tags toTagDTO(Tag tag);
 
     public abstract Tag toTag(TagResponse.Tags tagResponseDTO);

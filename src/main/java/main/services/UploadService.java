@@ -1,7 +1,7 @@
 package main.services;
 
 import lombok.RequiredArgsConstructor;
-import main.api.response.badresponse.FileUploadBadResponse;
+import main.api.response.BadResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,15 +47,12 @@ public class UploadService {
             filesService.copyMultiPartFileToPath(image,
                     Paths.get(directoryPath, imageName));
         } else {
-            FileUploadBadResponse fileUploadBadResponse
-                    = new FileUploadBadResponse();
-            FileUploadBadResponse.Errors errors
-                    = new FileUploadBadResponse.Errors();
-            errors.setImage("Размер файла превышает допустимый размер");
-            fileUploadBadResponse.setResult(false);
-            fileUploadBadResponse.setErrors(errors);
-            return new ResponseEntity<>(fileUploadBadResponse,
-                    HttpStatus.BAD_REQUEST);
+            BadResponse badResponse = new BadResponse();
+            BadResponse.Errors error = new BadResponse.Errors();
+            error.setImage("Размер файла превышает допустимый размер");
+            badResponse.setResult(false);
+            badResponse.setErrors(error);
+            return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(fileDestPath, HttpStatus.OK);
     }

@@ -9,7 +9,6 @@ import main.api.response.PostsResponse;
 import main.model.User;
 import main.services.PostService;
 import main.services.PostVoteService;
-import main.services.PostsService;
 import main.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class ApiPostController {
-    private final PostsService postsService;
     private final PostService postService;
     private final UserService userService;
     private final PostVoteService postVoteService;
@@ -40,13 +38,13 @@ public class ApiPostController {
             final @RequestParam(value = "mode") String mode) {
         switch (mode) {
             case "recent":
-                return postsService.getRecentPosts(offset, limit);
+                return postService.getRecentPosts(offset, limit);
             case "popular":
-                return postsService.getPopularPosts(offset, limit);
+                return postService.getPopularPosts(offset, limit);
             case "best":
-                return postsService.getBestPosts(offset, limit);
+                return postService.getBestPosts(offset, limit);
             case "early":
-                return postsService.getEarlyPosts(offset, limit);
+                return postService.getEarlyPosts(offset, limit);
             default:
                 throw new IllegalStateException("Unexpected value: " + mode);
         }
@@ -58,9 +56,9 @@ public class ApiPostController {
             final @RequestParam(value = "limit") int limit,
             final @RequestParam(value = "query") String query) {
         if (query.isBlank() || query.isEmpty() || query.matches("\\s+")) {
-            return postsService.getRecentPosts(offset, limit);
+            return postService.getRecentPosts(offset, limit);
         } else {
-            return postsService.getQueryPosts(offset, limit, query);
+            return postService.getQueryPosts(offset, limit, query);
         }
     }
 
@@ -69,7 +67,7 @@ public class ApiPostController {
             final @RequestParam(value = "offset") int offset,
             final @RequestParam(value = "limit") int limit,
             final @RequestParam(value = "date") String date) {
-        return postsService.getPostByDate(offset, limit, date);
+        return postService.getPostByDate(offset, limit, date);
     }
 
     @GetMapping(value = "/post/byTag", params = {"offset", "limit", "tag"})
@@ -77,7 +75,7 @@ public class ApiPostController {
             final @RequestParam(value = "offset") int offset,
             final @RequestParam(value = "limit") int limit,
             final @RequestParam(value = "tag") String tag) {
-        return postsService.getPostsByTag(offset, limit, tag);
+        return postService.getPostsByTag(offset, limit, tag);
     }
 
     @GetMapping(value = "/post/{id}")
@@ -94,8 +92,8 @@ public class ApiPostController {
         Authentication loggedInUser = SecurityContextHolder.getContext()
                 .getAuthentication();
         User user = userService.getUser(loggedInUser.getName());
-        return postsService.getMyPosts(offset, limit,
-                status, Math.toIntExact(user.getId()));
+        return postService.getMyPosts(offset, limit,
+                status, user.getId());
     }
 
     @GetMapping(value = "/post/moderation",
@@ -108,7 +106,7 @@ public class ApiPostController {
                 .getAuthentication();
         User user = userService.getUser(loggedInUser.getName());
         if (Boolean.TRUE.equals(user.getIsModerator())) {
-            return postsService.getModeratePosts(offset, limit,
+            return postService.getModeratePosts(offset, limit,
                     status, Math.toIntExact(user.getId()));
         } else {
             return new ResponseEntity<>("user not moderator",

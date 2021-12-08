@@ -1,15 +1,17 @@
 package main.services;
 
 import lombok.RequiredArgsConstructor;
+import main.api.mapper.PostsDTO;
+import main.api.mapper.PostsMyDTO;
 import main.api.request.PostAddRequest;
 import main.api.request.PostCommentRequest;
 import main.api.request.PostModerateRequest;
 import main.api.response.BooleanResponse;
 import main.api.response.PostCommentResponse;
 import main.api.response.PostResponse;
-import main.api.response.badresponse.PostAddBadResponse;
-import main.api.response.badresponse.PostCommentBadResponse;
-import main.mapper.PostDTO;
+import main.api.response.BadResponse;
+import main.api.response.PostsMyResponse;
+import main.api.response.PostsResponse;
 import main.model.GlobalSettings;
 import main.model.Post;
 import main.model.PostComment;
@@ -22,6 +24,7 @@ import main.repository.PostRepository;
 import main.repository.TagRepository;
 import main.utils.SaveToEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -50,7 +53,10 @@ public class PostService {
     private final TagToPostService tagToPostService;
     private final UserService userService;
     private final SettingsService settingsService;
-    private final PostDTO postDTO;
+    private final PostsDTO postsDTO;
+    private final PostsMyDTO postsMyDTO;
+    private final PostsResponse postsResponse;
+    private final PostsMyResponse postsMyResponse;
 
     public final Post getPostById(final int id) {
         Optional<Post> optionalPost = postRepository.findById((long) id);
@@ -71,15 +77,9 @@ public class PostService {
             return new ResponseEntity<>(getPostNotLoginUser(post),
                     HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(postDTO.postResponseDto(post),
+            return new ResponseEntity<>(new PostResponse(post),
                     HttpStatus.OK);
         }
-    }
-
-    private PostResponse getPostNotLoginUser(final Post post) {
-        post.setViewCount(post.getViewCount() + 1);
-        postRepository.save(post);
-        return postDTO.postResponseDto(post);
     }
 
     public final ResponseEntity<?> addPost(
@@ -96,7 +96,7 @@ public class PostService {
                 ? LocalDateTime.now(ZoneOffset.UTC)
                 : timestamp;
         boolean isActive = active == 1;
-        ResponseEntity<PostAddBadResponse> response = badResponse(title, text);
+        ResponseEntity<BadResponse> response = badResponse(title, text);
         if (response != null) {
             return response;
         }
@@ -113,8 +113,8 @@ public class PostService {
         for (String tag : tags) {
             if (!tag.isBlank()) {
                 Tag currentTag = tagRepository
-                        .getTagByTagName(tag) != null
-                        ? tagRepository.getTagByTagName(tag)
+                        .getTagByName(tag) != null
+                        ? tagRepository.getTagByName(tag)
                         : tagService.addTag(
                         new SaveToEntity().tagToEntity(tag));
                 tagToPostService.addTagToPost(
@@ -140,7 +140,7 @@ public class PostService {
                 || timestamp.isBefore(LocalDateTime.now(ZoneOffset.UTC))
                 ? LocalDateTime.now(ZoneOffset.UTC)
                 : timestamp;
-        ResponseEntity<PostAddBadResponse> response = badResponse(title, text);
+        ResponseEntity<BadResponse> response = badResponse(title, text);
         if (response != null) {
             return response;
         }
@@ -167,8 +167,8 @@ public class PostService {
         for (String tag : tags) {
             if (!tag.isBlank()) {
                 Tag currentTag = tagRepository
-                        .getTagByTagName(tag) != null
-                        ? tagRepository.getTagByTagName(tag)
+                        .getTagByName(tag) != null
+                        ? tagRepository.getTagByName(tag)
                         : tagService.addTag(
                         new SaveToEntity().tagToEntity(tag));
                 TagToPost tagToPost = new SaveToEntity()
@@ -182,19 +182,16 @@ public class PostService {
     public final ResponseEntity<?> addComment(
             final PostCommentRequest postCommentRequest,
             final User user) {
-        PostCommentBadResponse postCommentBadResponse
-                = new PostCommentBadResponse();
-        PostCommentBadResponse.Errors error
-                = new PostCommentBadResponse.Errors();
+        BadResponse badResponse = new BadResponse();
+        BadResponse.Errors error = new BadResponse.Errors();
         Integer parentId = postCommentRequest.getParentId();
         Integer postId = postCommentRequest.getPostId();
         String text = postCommentRequest.getText();
         if (!isTextValid(text)) {
             error.setText("Текст комментария не задан или слишком короткий");
-            postCommentBadResponse.setResult(false);
-            postCommentBadResponse.setErrors(error);
-            return new ResponseEntity<>(postCommentBadResponse,
-                    HttpStatus.BAD_REQUEST);
+            badResponse.setResult(false);
+            badResponse.setErrors(error);
+            return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
         }
         PostComment parentComment = null;
         Post parentPost = null;
@@ -236,6 +233,171 @@ public class PostService {
                 new BooleanResponse(true), HttpStatus.OK);
     }
 
+    public final ResponseEntity<PostsResponse> getRecentPosts(
+            final int offset,
+            final int limit) {
+        postsResponse.setCount(postRepository.countAllPosts());
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .recentPosts(PageRequest.of(offset, limit))));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsResponse> getBestPosts(
+            final int offset,
+            final int limit) {
+        postsResponse.setCount(postRepository.countAllPosts());
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .bestPosts(PageRequest.of(offset, limit))));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsResponse> getPopularPosts(
+            final int offset,
+            final int limit) {
+        postsResponse.setCount(postRepository.countAllPosts());
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .popularPosts(PageRequest.of(offset, limit))));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsResponse> getEarlyPosts(
+            final int offset,
+            final int limit) {
+        postsResponse.setCount(postRepository.countAllPosts());
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .earlyPosts(PageRequest.of(offset, limit))));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsResponse> getQueryPosts(
+            final int offset,
+            final int limit,
+            final String query) {
+        postsResponse.setCount(postRepository.countSearchedPosts(query));
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .searchPosts(PageRequest.of(offset, limit), query)));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsResponse> getPostByDate(
+            final int offset,
+            final int limit,
+            final String date) {
+        postsResponse.setCount(postRepository.countPostsByDate(date));
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .getPostsByDate(date, PageRequest.of(offset, limit))));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsResponse> getPostsByTag(
+            final int offset,
+            final int limit,
+            final String tag) {
+        postsResponse.setCount(postRepository.countPostsByTag(tag));
+        postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
+                .getPostsByTag(tag, PageRequest.of(offset, limit))));
+        return new ResponseEntity<>(postsResponse, HttpStatus.OK);
+    }
+
+    public final ResponseEntity<PostsMyResponse> getMyPosts(
+            final int offset,
+            final int limit,
+            final String status,
+            final long userId) {
+        switch (status) {
+            case "inactive":
+                postsMyResponse.setCount(
+                        postRepository.countMyNotActivePosts(
+                                userId));
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getMyNotActivePosts(PageRequest
+                                        .of(offset, limit), userId)));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            case "pending":
+                postsMyResponse.setCount(
+                        postRepository.countMyActivePosts(
+                                ModerationStatus.NEW, userId));
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getMyActivePosts(PageRequest.of(offset, limit),
+                                        ModerationStatus.NEW,
+                                        userId)));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            case "declined":
+                postsMyResponse.setCount(
+                        postRepository.countMyActivePosts(
+                                ModerationStatus.DECLINED, userId));
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getMyActivePosts(PageRequest.of(offset, limit),
+                                        ModerationStatus.DECLINED,
+                                        userId)));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            case "published":
+                postsMyResponse.setCount(
+                        postRepository.countMyActivePosts(
+                                ModerationStatus.ACCEPTED, userId));
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getMyActivePosts(PageRequest.of(offset, limit),
+                                        ModerationStatus.ACCEPTED,
+                                        userId)));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            default:
+                throw new IllegalStateException("Unexpected value: " + status);
+        }
+    }
+
+    public final ResponseEntity<PostsMyResponse> getModeratePosts(
+            final int offset,
+            final int limit,
+            final String status,
+            final int moderateUserId) {
+        switch (status.toLowerCase()) {
+            case "new":
+                postsMyResponse.setCount(
+                        postRepository.countPostsForModeration());
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getPostsForModeration(PageRequest
+                                        .of(offset, limit))));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            case "declined":
+                postsMyResponse.setCount(
+                        postRepository.countPostsModeratedByMe(
+                                ModerationStatus.DECLINED.toString(),
+                                moderateUserId));
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getPostsModeratedByMe(PageRequest
+                                                .of(offset, limit),
+                                        ModerationStatus.DECLINED,
+                                        moderateUserId)));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            case "accepted":
+                postsMyResponse.setCount(
+                        postRepository.countPostsModeratedByMe(
+                                ModerationStatus.ACCEPTED.toString(),
+                                moderateUserId));
+                postsMyResponse.setPostsDTOs(
+                        postsMyDTO.toPostDTOs(postRepository
+                                .getPostsModeratedByMe(PageRequest
+                                                .of(offset, limit),
+                                        ModerationStatus.ACCEPTED,
+                                        moderateUserId)));
+                return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
+            default:
+                throw new IllegalStateException("Unexpected value: " + status);
+        }
+    }
+
+    private PostResponse getPostNotLoginUser(final Post post) {
+        post.setViewCount(post.getViewCount() + 1);
+        postRepository.save(post);
+        return new PostResponse(post);
+    }
+
     private PostComment getPostCommentById(final int id) {
         Optional<PostComment> optionalComment
                 = postCommentRepository.findById((long) id);
@@ -253,7 +415,7 @@ public class PostService {
         Optional<GlobalSettings> settingsOptional = settingsService
                 .getAllGlobalSettingsSet()
                 .stream().filter(g -> g.getCode()
-                        .equalsIgnoreCase(SettingsService.POST_PREMODERATION))
+                        .equalsIgnoreCase("POST_PREMODERATION"))
                 .findFirst();
         return settingsOptional.isPresent()
                 && settingsOptional.get().getValue().equalsIgnoreCase("YES");
@@ -269,24 +431,22 @@ public class PostService {
         return postAddRequest.getTime();
     }
 
-    private ResponseEntity<PostAddBadResponse> badResponse(
+    private ResponseEntity<BadResponse> badResponse(
             final String title,
             final String text) {
-        PostAddBadResponse postAddBad
-                = new PostAddBadResponse();
-        PostAddBadResponse.Errors errors
-                = new PostAddBadResponse.Errors();
+        BadResponse badResponse = new BadResponse();
+        BadResponse.Errors error = new BadResponse.Errors();
         if (title.length() < postTitleMinLength) {
-            errors.setTitle("Заголовок не установлен");
-            postAddBad.setResult(false);
-            postAddBad.setErrors(errors);
-            return new ResponseEntity<>(postAddBad, HttpStatus.BAD_REQUEST);
+            error.setTitle("Заголовок не установлен");
+            badResponse.setResult(false);
+            badResponse.setErrors(error);
+            return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
         }
         if (text.length() < postTextMinLength) {
-            errors.setText("Текст публикации слишком короткий");
-            postAddBad.setResult(false);
-            postAddBad.setErrors(errors);
-            return new ResponseEntity<>(postAddBad, HttpStatus.BAD_REQUEST);
+            error.setText("Текст публикации слишком короткий");
+            badResponse.setResult(false);
+            badResponse.setErrors(error);
+            return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
         }
         return null;
     }

@@ -2,7 +2,7 @@ package main.services;
 
 import lombok.RequiredArgsConstructor;
 import main.api.response.TagResponse;
-import main.mapper.TagDTO;
+import main.api.mapper.TagDTO;
 import main.model.Tag;
 import main.repository.TagRepository;
 import org.springframework.http.HttpStatus;

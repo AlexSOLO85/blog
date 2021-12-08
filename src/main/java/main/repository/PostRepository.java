@@ -1,309 +1,189 @@
 package main.repository;
 
 import main.model.Post;
+import main.model.enumerated.ModerationStatus;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
-    @Query(
-            value = "SELECT COUNT(posts.id) "
-                    + "FROM posts "
-                    + "WHERE posts.is_active = TRUE "
-                    + "AND posts.moderation_status = 'ACCEPTED'"
-                    + "AND posts.time < NOW()",
-            nativeQuery = true)
+    @Query("select count(p.id) "
+            + "from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time")
     int countAllPosts();
 
-    @Query(
-            value = "SELECT COUNT(posts.id) "
-                    + "FROM posts "
-                    + "WHERE posts.is_active = TRUE "
-                    + "AND posts.moderation_status = 'NEW'",
-            nativeQuery = true)
+    @Query("select count(p.id) "
+            + "from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'NEW'")
     int countModeratePosts();
 
-    @Query(
-            value = "SELECT *"
-                    + "FROM posts "
-                    + "WHERE posts.is_active = TRUE "
-                    + "AND posts.moderation_status = 'ACCEPTED'"
-                    + "AND posts.time < NOW()"
-                    + "ORDER BY posts.time DESC "
-                    + "LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> recentPosts(int offset, int limit);
+    @Query("select p from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "order by p.time desc")
+    List<Post> recentPosts(Pageable pageable);
 
-    @Query(
-            value = "SELECT *"
-                    + "FROM posts "
-                    + "LEFT JOIN "
-                    + "(SELECT post_votes.post_id, "
-                    + "SUM(post_votes.value) AS sum_values "
-                    + "FROM post_votes "
-                    + "GROUP BY post_votes.post_id) AS sum_votes "
-                    + "ON posts.id = sum_votes.post_id "
-                    + "WHERE posts.is_active = TRUE "
-                    + "AND posts.moderation_status = 'ACCEPTED'"
-                    + "AND posts.time < NOW()"
-                    + "ORDER BY sum_values DESC "
-                    + "LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> bestPosts(int offset, int limit);
+    @Query("select p, sum(pv.value) as sum_votes from Post p "
+            + "left join p.postVotes pv "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "group by p.id "
+            + "order by sum_votes desc")
+    List<Post> bestPosts(Pageable pageable);
 
-    @Query(
-            value = "SELECT *"
-                    + "FROM posts "
-                    + "LEFT JOIN "
-                    + "(SELECT post_comments.post_id,"
-                    + "COUNT(post_comments.post_id) AS post_counts "
-                    + "FROM post_comments "
-                    + "GROUP BY post_comments.post_id) AS counts "
-                    + "ON posts.id = counts.post_id "
-                    + "WHERE posts.is_active = TRUE "
-                    + "AND posts.moderation_status = 'ACCEPTED' "
-                    + "AND posts.time < NOW() "
-                    + "ORDER BY post_counts DESC "
-                    + "LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> popularPosts(int offset, int limit);
+    @Query("select p, count(pc.id) as sum_comments from Post p "
+            + "left join p.postComments pc "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "group by p.id "
+            + "order by sum_comments desc")
+    List<Post> popularPosts(Pageable pageable);
 
-    @Query(
-            value = "SELECT *"
-                    + "FROM posts "
-                    + "WHERE posts.is_active = TRUE "
-                    + "AND posts.moderation_status = 'ACCEPTED'"
-                    + "AND posts.time < NOW()"
-                    + "ORDER BY posts.time "
-                    + "LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> earlyPosts(int offset, int limit);
+    @Query("select p from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "order by p.time")
+    List<Post> earlyPosts(Pageable pageable);
 
-    @Query(
-            value = "SELECT DISTINCT * "
-                    + "FROM posts p "
-                    + "WHERE (p.text LIKE CONCAT('%',?3,'%')"
-                    + "OR p.title LIKE CONCAT('%',?3,'%')) "
-                    + "AND p.is_active = 1 "
-                    + "AND p.moderation_status = 'ACCEPTED' "
-                    + "AND p.time < NOW() "
-                    + "ORDER BY p.time "
-                    + "DESC LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> searchPosts(int offset, int limit, String query);
+    @Query("select distinct p from Post p "
+            + "where p.text like %:query% "
+            + "or p.title like %:query% "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "order by p.time")
+    List<Post> searchPosts(Pageable pageable, @Param("query") String query);
 
-    @Query(
-            value = "SELECT COUNT(searched_posts.id) "
-                    + "FROM "
-                    + "(SELECT DISTINCT * FROM posts p "
-                    + "WHERE (p.text LIKE CONCAT('%',?1,'%')"
-                    + "OR p.title LIKE CONCAT('%',?1,'%')) "
-                    + "AND p.is_active = 1 "
-                    + "AND p.moderation_status = 'ACCEPTED' "
-                    + "AND p.time < NOW()) AS searched_posts",
-            nativeQuery = true)
-    int countSearchedPosts(String query);
+    @Query("select distinct count(p.id) from Post p "
+            + "where p.text like %:query% "
+            + "or p.title like %:query% "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time")
+    int countSearchedPosts(@Param("query") String query);
 
-    @Query(
-            value = "SELECT * "
-                    + "FROM posts p  "
-                    + "WHERE YEAR(p.time) = ? "
-                    + "AND p.is_active = TRUE "
-                    + "AND p.moderation_status = 'ACCEPTED'"
-                    + "AND p.time < NOW()",
-            nativeQuery = true)
-    List<Post> getPostsByYear(int year);
+    @Query("select p from Post p "
+            + "where substring(p.time, 1, 4) = :year "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time")
+    List<Post> getPostsByYear(@Param("year") String year);
 
-    @Query(
-            value = "SELECT DISTINCT "
-                    + "YEAR(p.time) AS post_year "
-                    + "FROM posts p "
-                    + "WHERE p.is_active = TRUE "
-                    + "AND p.moderation_status = 'ACCEPTED'"
-                    + "AND p.time < NOW()"
-                    + "ORDER BY post_year DESC",
-            nativeQuery = true)
+    @Query("select distinct substring(p.time, 1, 4) from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time")
     List<Integer> getYearsWithAnyPosts();
 
-    @Query(
-            value = "SELECT * "
-                    + "FROM posts p "
-                    + "WHERE DATEDIFF(p.time, ?) = 0 "
-                    + "AND p.is_active = 1 "
-                    + "AND p.moderation_status = 'ACCEPTED' "
-                    + "AND p.time < NOW() "
-                    + "ORDER BY p.time "
-                    + "DESC LIMIT ? OFFSET ?",
-            nativeQuery = true)
-    List<Post> getPostsByDate(String date, int limit, int offset);
+    @Query("select p from Post p "
+            + "where function('DATEDIFF', p.time, :date) = 0 "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "order by p.time")
+    List<Post> getPostsByDate(@Param("date") String date, Pageable pageable);
 
-    @Query(
-            value =
-                    "SELECT COUNT(searched_posts.id) "
-                            + "FROM "
-                            + "(SELECT * FROM posts p "
-                            + "WHERE DATEDIFF(p.time, ?) = 0 "
-                            + "AND p.is_active = 1 "
-                            + "AND p.moderation_status = 'ACCEPTED' "
-                            + "AND p.time < NOW()) AS searched_posts",
-            nativeQuery = true)
-    int countPostsByDate(String dateString);
+    @Query("select count(p.id) from Post p "
+            + "where function('DATEDIFF', p.time, :dateString) = 0 "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time")
+    int countPostsByDate(@Param("dateString") String dateString);
 
-    @Query(
-            value = "SELECT DISTINCT p.* "
-                    + "FROM posts AS p "
-                    + "INNER JOIN tag2post t2 "
-                    + "ON p.id = t2.post_id "
-                    + "INNER JOIN tags t "
-                    + "ON t.id  = t2.tag_id "
-                    + "WHERE (t.name LIKE CONCAT('%',?1,'%')) "
-                    + "AND p.is_active = 1 "
-                    + "AND p.moderation_status = 'ACCEPTED' "
-                    + "AND p.time < NOW() "
-                    + "ORDER BY p.time DESC "
-                    + "LIMIT ?2 OFFSET ?3",
-            nativeQuery = true)
-    List<Post> getPostsByTag(String tag, int limit, int offset);
+    @Query("select distinct p, t2p from Post p "
+            + "inner join p.tagsToPosts t2p "
+            + "where t2p.tag.name like %:tag% "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time "
+            + "order by p.time")
+    List<Post> getPostsByTag(@Param("tag") String tag, Pageable pageable);
 
-    @Query(
-            value = "SELECT COUNT(searched_posts.id) "
-                    + "FROM (SELECT DISTINCT p.* "
-                    + "FROM posts AS p "
-                    + "INNER JOIN tag2post t2 "
-                    + "ON p.id = t2.post_id "
-                    + "INNER JOIN tags t "
-                    + "ON t.id  = t2.tag_id "
-                    + "WHERE (t.name LIKE CONCAT('%',?1,'%')) "
-                    + "AND p.is_active = 1 "
-                    + "AND p.moderation_status = 'ACCEPTED' "
-                    + "AND p.time < NOW()) AS searched_posts",
-            nativeQuery = true)
-    int countPostsByTag(String tag);
+    @Query("select distinct count(p.id) from Post p "
+            + "inner join p.tagsToPosts t2p "
+            + "where t2p.tag.name like %:tag% "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "and p.time < current_time")
+    int countPostsByTag(@Param("tag") String tag);
 
-    @Query(
-            value = "SELECT *"
-                    + "FROM posts "
-                    + "WHERE posts.moderation_status = 'ACCEPTED'"
-                    + "AND posts.time < NOW()"
-                    + "AND posts.id = ?1",
-            nativeQuery = true)
-    Post findByIdPost(int id);
+    @Query("select p from Post p "
+            + "where p.user.id = :userId "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = :status "
+            + "order by p.time")
+    List<Post> getMyActivePosts(Pageable pageable,
+                                @Param("status") ModerationStatus status,
+                                @Param("userId") long userId);
 
-    @Query(
-            value =
-                    "SELECT * "
-                            + "FROM posts p "
-                            + "WHERE p.user_id = ?4 "
-                            + "AND p.is_active = 1 "
-                            + "AND p.moderation_status = ?3 "
-                            + "ORDER BY p.time "
-                            + "DESC LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> getMyActivePosts(int offset, int limit,
-                                String status, int userId);
+    @Query("select count(p.id) from Post p "
+            + "where p.user.id = :userId "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = :status")
+    int countMyActivePosts(@Param("status") ModerationStatus status,
+                           @Param("userId") long userId);
 
-    @Query(
-            value
-                    = "SELECT COUNT(searched_posts.id) "
-                    + "FROM (SELECT * FROM posts p "
-                    + "WHERE p.user_id = ?2 "
-                    + "AND p.is_active = 1 "
-                    + "AND p.moderation_status = ?1) "
-                    + "AS searched_posts",
-            nativeQuery = true)
-    int countMyActivePosts(String moderationStatus, int id);
+    @Query("select p from Post p "
+            + "where p.user.id = :userId "
+            + "and p.isActive = false "
+            + "order by p.time")
+    List<Post> getMyNotActivePosts(Pageable pageable,
+                                   @Param("userId") long userId);
 
-    @Query(
-            value =
-                    "SELECT * "
-                            + "FROM posts p "
-                            + "WHERE p.user_id = ?3 "
-                            + "AND p.is_active = 0 "
-                            + "ORDER BY p.time "
-                            + "DESC LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> getMyNotActivePosts(int offset, int limit, int userId);
+    @Query("select count(p.id) from Post p "
+            + "where p.user.id = :userId "
+            + "and p.isActive = false")
+    int countMyNotActivePosts(@Param("userId") long userId);
 
-    @Query(
-            value =
-                    "SELECT COUNT(searched_posts.id) "
-                            + "FROM (SELECT * FROM posts p "
-                            + "WHERE p.user_id = ?1 "
-                            + "AND p.is_active = 0) "
-                            + "AS searched_posts",
-            nativeQuery = true)
-    int countMyNotActivePosts(int id);
+    @Query("select p from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'NEW' "
+            + "order by p.time")
+    List<Post> getPostsForModeration(Pageable pageable);
 
-    @Query(
-            value =
-                    "SELECT * "
-                            + "FROM posts p "
-                            + "WHERE p.is_active = 1 "
-                            + "AND p.moderation_status = 'NEW' "
-                            + "ORDER BY p.time "
-                            + "DESC LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> getPostsForModeration(int offset, int limit);
-
-    @Query(
-            value =
-                    "SELECT COUNT(p.id) "
-                            + "FROM posts p "
-                            + "WHERE p.is_active = 1 "
-                            + "AND p.moderation_status = 'NEW'",
-            nativeQuery = true)
+    @Query("select count(p.id) from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'NEW'")
     int countPostsForModeration();
 
-    @Query(
-            value =
-                    "SELECT * "
-                            + "FROM posts p "
-                            + "WHERE p.moderator_id = ?4 "
-                            + "AND p.is_active = 1 "
-                            + "AND p.moderation_status = ?3 "
-                            + "ORDER BY p.time "
-                            + "DESC LIMIT ?2 OFFSET ?1",
-            nativeQuery = true)
-    List<Post> getPostsModeratedByMe(int offset, int limit,
-                                     String status, int moderatorId);
+    @Query("select p from Post p "
+            + "where p.moderatorId = :moderatorId "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = :status "
+            + "order by p.time")
+    List<Post> getPostsModeratedByMe(Pageable pageable,
+                                     @Param("status") ModerationStatus status,
+                                     @Param("moderatorId") int moderatorId);
 
-    @Query(
-            value =
-                    "SELECT COUNT(searched_posts.id) "
-                            + "FROM (SELECT * FROM posts p "
-                            + "WHERE p.moderator_id = ?2 "
-                            + "AND p.is_active = 1 "
-                            + "AND p.moderation_status = ?1) "
-                            + "AS searched_posts",
-            nativeQuery = true)
-    int countPostsModeratedByMe(String moderationStatus, int id);
+    @Query("select count(p.id) from Post p "
+            + "where p.moderatorId = :moderatorId "
+            + "and p.isActive = true "
+            + "and p.moderationStatus = :moderationStatus")
+    int countPostsModeratedByMe(
+            @Param("moderationStatus") String moderationStatus,
+            @Param("moderatorId") int moderatorId);
 
-    @Query(
-            value =
-                    "SELECT count(id) "
-                            + "AS count "
-                            + "FROM posts",
-            nativeQuery = true)
+    @Query("select count(p) from Post p")
     int countAllPostsAtDatabase();
 
-    @Query(
-            value =
-                    "SELECT sum(p.view_count) "
-                            + "AS views "
-                            + "FROM posts p",
-            nativeQuery = true)
+    @Query("select sum(p.viewCount) from Post p")
     int countAllViews();
 
-    @Query(
-            value =
-                    "SELECT p.time "
-                            + "FROM posts p "
-                            + "WHERE p.is_active = 1 "
-                            + "AND p.moderation_status = 'ACCEPTED' "
-                            + "ORDER BY p.time "
-                            + "ASC LIMIT 1",
-            nativeQuery = true)
-    LocalDateTime getFirstPublicationDate();
+    @Query("select p.time from Post p "
+            + "where p.isActive = true "
+            + "and p.moderationStatus = 'ACCEPTED' "
+            + "order by p.time")
+    LocalDateTime getFirstPublicationDate(PageRequest pageRequest);
 }

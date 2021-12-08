@@ -84,7 +84,7 @@
             <column name="is_active" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="moderation_status" type="VARCHAR(255)" defaultValue="NEW">
+            <column name="moderation_status" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="moderator_id" type="BIGINT"/>

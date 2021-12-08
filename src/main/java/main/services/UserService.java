@@ -8,8 +8,7 @@ import main.api.request.RegisterRequest;
 import main.api.request.RestorePassRequest;
 import main.api.response.BooleanResponse;
 import main.api.response.StatisticsResponse;
-import main.api.response.badresponse.ChangePassBadResponse;
-import main.api.response.badresponse.ProfileBadResponse;
+import main.api.response.BadResponse;
 import main.model.CaptchaCode;
 import main.model.GlobalSettings;
 import main.model.Post;
@@ -23,6 +22,7 @@ import main.repository.UserRepository;
 import main.utils.LocalTimeMapper;
 import main.utils.SaveToEntity;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
@@ -93,8 +93,7 @@ public class UserService {
         boolean isMultiUserMode = false;
         for (GlobalSettings settings : settingsService
                 .getAllGlobalSettingsSet()) {
-            if (settings.getCode().equals(SettingsService
-                    .MULTIUSER_MODE)) {
+            if (settings.getCode().equals("MULTIUSER_MODE")) {
                 isMultiUserMode = settings.getValue().equals("YES");
             }
         }
@@ -107,7 +106,7 @@ public class UserService {
         String captcha = registerRequest.getCaptcha();
         String captchaSecret = registerRequest.getCaptchaSecret();
         String defaultPhoto = "src/main/resources/static/default-1.png";
-        ResponseEntity<ProfileBadResponse> response
+        ResponseEntity<BadResponse> response
                 = badRegisterResponse(email, password, name,
                 captcha, captchaSecret);
         if (response != null) {
@@ -193,27 +192,27 @@ public class UserService {
         return resizedImage;
     }
 
-    private ResponseEntity<ProfileBadResponse> getProfilePhotoBadResponse() {
-        ProfileBadResponse profileBadResponse = new ProfileBadResponse();
-        ProfileBadResponse.Errors error = new ProfileBadResponse.Errors();
+    private ResponseEntity<BadResponse> getProfilePhotoBadResponse() {
+        BadResponse badResponse = new BadResponse();
+        BadResponse.Errors error = new BadResponse.Errors();
         error.setName("Фото слишком большое, нужно не более 5 Мб");
-        profileBadResponse.setResult(false);
-        profileBadResponse.setErrors(error);
-        return new ResponseEntity<>(profileBadResponse, HttpStatus.BAD_REQUEST);
+        badResponse.setResult(false);
+        badResponse.setErrors(error);
+        return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
     }
 
-    private ResponseEntity<ProfileBadResponse> getProfileBadResponse(
+    private ResponseEntity<BadResponse> getProfileBadResponse(
             final boolean isNameValid,
             final boolean isEmailValid,
             final boolean isPassValid) {
-        ProfileBadResponse profileBadResponse = new ProfileBadResponse();
-        ProfileBadResponse.Errors error = new ProfileBadResponse.Errors();
+        BadResponse badResponse = new BadResponse();
+        BadResponse.Errors error = new BadResponse.Errors();
         error.setEmail(!isEmailValid ? "Этот e-mail уже зарегистрирован" : "");
         error.setName(!isNameValid ? "Имя указано неверно" : "");
         error.setPassword(!isPassValid ? "Пароль короче 6-ти символов" : "");
-        profileBadResponse.setResult(false);
-        profileBadResponse.setErrors(error);
-        return new ResponseEntity<>(profileBadResponse, HttpStatus.BAD_REQUEST);
+        badResponse.setResult(false);
+        badResponse.setErrors(error);
+        return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
     }
 
     private void isRemovePhotoByUser(final User user, final Byte removePhoto) {
@@ -301,7 +300,7 @@ public class UserService {
         boolean isCodeValid = (user != null);
         boolean isPassValid = isPasswordValid(password);
         boolean isCaptchaCodeValid = isCaptchaValid(captcha, captchaSecret);
-        ResponseEntity<ChangePassBadResponse> response
+        ResponseEntity<BadResponse> response
                 = badChangePassResponse(
                 isCodeValid,
                 isPassValid,
@@ -360,8 +359,7 @@ public class UserService {
         boolean isStatisticsIsPublic = false;
         for (GlobalSettings settings : settingsService
                 .getAllGlobalSettingsSet()) {
-            if (settings.getCode().equals(SettingsService
-                    .STATISTICS_IS_PUBLIC)) {
+            if (settings.getCode().equals("STATISTICS_IS_PUBLIC")) {
                 isStatisticsIsPublic = settings.getValue().equals("YES");
             }
         }
@@ -375,7 +373,8 @@ public class UserService {
         int allDislikeCount = postVoteRepository.countAllDislikes();
         int viewsCount = postRepository.countAllViews();
         long firstPublicationDate = localTimeMapper
-                .dateToLong(postRepository.getFirstPublicationDate());
+                .dateToLong(postRepository.getFirstPublicationDate(PageRequest
+                        .of(0, 1)));
         StatisticsResponse statisticsResponse =
                 new StatisticsResponse(
                         postsCount,
@@ -386,14 +385,12 @@ public class UserService {
         return new ResponseEntity<>(statisticsResponse.getMap(), HttpStatus.OK);
     }
 
-    private ResponseEntity<ChangePassBadResponse> badChangePassResponse(
+    private ResponseEntity<BadResponse> badChangePassResponse(
             final boolean isCodeValid,
             final boolean isPassValid,
             final boolean isCaptchaCodeValid) {
-        ChangePassBadResponse response
-                = new ChangePassBadResponse();
-        ChangePassBadResponse.Errors error
-                = new ChangePassBadResponse.Errors();
+        BadResponse badResponse = new BadResponse();
+        BadResponse.Errors error = new BadResponse.Errors();
         if (!isCodeValid || !isPassValid || !isCaptchaCodeValid) {
             error.setCode(!isCodeValid
                     ? "Ссылка для восстановления пароля устарела. "
@@ -403,21 +400,21 @@ public class UserService {
                     ? "Пароль короче 6-ти символов!" : "");
             error.setCaptcha(!isCaptchaCodeValid
                     ? "Код с картинки введён неверно" : "");
-            response.setResult(false);
-            response.setErrors(error);
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            badResponse.setResult(false);
+            badResponse.setErrors(error);
+            return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
         }
         return null;
     }
 
-    private ResponseEntity<ProfileBadResponse> badRegisterResponse(
+    private ResponseEntity<BadResponse> badRegisterResponse(
             final String email,
             final String password,
             final String name,
             final String captcha,
             final String captchaSecret) {
-        ProfileBadResponse profileBadResponse = new ProfileBadResponse();
-        ProfileBadResponse.Errors error = new ProfileBadResponse.Errors();
+        BadResponse badResponse = new BadResponse();
+        BadResponse.Errors error = new BadResponse.Errors();
         boolean isUserExistsByEmail = userRepository
                 .getUserByEmail(email.toLowerCase()) != null;
         boolean isNameValid = isNameValid(name);
@@ -433,10 +430,9 @@ public class UserService {
                     ? "Пароль короче 6-ти символов" : "");
             error.setCaptcha(!isCaptchaCodeValid
                     ? "Код с картинки введён неверно" : "");
-            profileBadResponse.setResult(false);
-            profileBadResponse.setErrors(error);
-            return new ResponseEntity<>(profileBadResponse,
-                    HttpStatus.BAD_REQUEST);
+            badResponse.setResult(false);
+            badResponse.setErrors(error);
+            return new ResponseEntity<>(badResponse, HttpStatus.BAD_REQUEST);
         }
         return null;
     }
@@ -444,7 +440,7 @@ public class UserService {
     private Boolean isCaptchaValid(final String captcha,
                                    final String captchaSecret) {
         CaptchaCode captchaCode = captchaRepository
-                .getCaptchaBySecretCode(captchaSecret);
+                .getBySecretCodeEquals(captchaSecret);
         return captchaCode != null && captchaCode.getCode().equals(captcha);
     }
 

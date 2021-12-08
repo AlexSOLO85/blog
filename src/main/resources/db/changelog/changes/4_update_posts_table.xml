@@ -8,6 +8,7 @@
     <changeSet id="4.1" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-10 10:57:03"/>
@@ -20,6 +21,7 @@
     <changeSet id="4.2" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-11 10:58:03"/>
@@ -32,6 +34,7 @@
     <changeSet id="4.3" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-12 11:58:08"/>
@@ -44,6 +47,7 @@
     <changeSet id="4.4" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-13 11:59:08"/>
@@ -56,6 +60,7 @@
     <changeSet id="4.5" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-14 12:59:08"/>
@@ -68,6 +73,7 @@
     <changeSet id="4.6" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-15 12:59:08"/>
@@ -80,6 +86,7 @@
     <changeSet id="4.7" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="2"/>
             <column name="time" value="2021-10-16 12:59:08"/>
@@ -92,6 +99,7 @@
     <changeSet id="4.8" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="1"/>
             <column name="time" value="2021-10-17 12:59:08"/>
@@ -104,6 +112,7 @@
     <changeSet id="4.9" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="2"/>
             <column name="time" value="2021-10-18 12:59:08"/>
@@ -116,6 +125,7 @@
     <changeSet id="4.10" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="2"/>
             <column name="time" value="2021-10-19 12:59:08"/>
@@ -128,6 +138,7 @@
     <changeSet id="4.11" author="Alexander">
         <insert tableName="posts">
             <column name="is_active" valueBoolean="true"/>
+            <column name="moderation_status" value="ACCEPTED"/>
             <column name="moderator_id" value="1"/>
             <column name="user_id" value="2"/>
             <column name="time" value="2021-10-20 12:59:08"/>

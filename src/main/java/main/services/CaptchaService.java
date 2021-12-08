@@ -61,7 +61,7 @@ public class CaptchaService {
     public final ResponseEntity<CaptchaResponse> generateCaptcha() {
         LocalDateTime captchaDeleteBeforeTime =
                 LocalDateTime.now().minusMinutes(oldCaptchaDeleteTimeInMin);
-        captchaRepository.deleteOldCaptcha(captchaDeleteBeforeTime);
+        captchaRepository.deleteByTimeBefore(captchaDeleteBeforeTime);
 
         Cage cage = getCage();
         String secretCode = generateRandomString();

@@ -19,9 +19,9 @@ public class CalendarService {
     private final PostRepository postRepository;
 
     public final ResponseEntity<CalendarResponse> countPostsByYear(
-            final Integer queriedYear) {
-        int year = queriedYear == null
-                ? LocalDateTime.now().getYear() : queriedYear;
+            final String queriedYear) {
+        String year = queriedYear == null
+                ? String.valueOf(LocalDateTime.now().getYear()) : queriedYear;
         List<Post> postsByYear = postRepository.getPostsByYear(year);
         HashMap<Date, Integer> postsCountByDate = new HashMap<>();
         for (Post p : postsByYear) {
