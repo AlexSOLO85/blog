@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import lombok.RequiredArgsConstructor;
 import main.api.response.TagResponse;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TagService {
     private final TagRepository tagRepository;
-    private final TagResponse tagResponse;
     private final TagDTO tagDTO;
 
     public final ResponseEntity<TagResponse> getTagWithoutQueryResponse() {
+        TagResponse tagResponse = new TagResponse();
         tagResponse.setTags(tagDTO.toTagDTOs(tagRepository
                 .getAllTagsListSortedByIdDesc()));
         return new ResponseEntity<>(tagResponse, HttpStatus.OK);
@@ -24,6 +24,7 @@ public class TagService {
 
     public final ResponseEntity<TagResponse> getTagWithQueryResponse(
             final String query) {
+        TagResponse tagResponse = new TagResponse();
         if (query == null || query.equals("") || query.isBlank()) {
             return getTagWithoutQueryResponse();
         } else {

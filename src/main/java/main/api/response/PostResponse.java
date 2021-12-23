@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import main.model.Post;
 import main.model.TagToPost;
-import main.utils.LocalTimeMapper;
+import main.util.LocalTimeMapper;
 
 import java.util.ArrayList;
 import java.util.List;

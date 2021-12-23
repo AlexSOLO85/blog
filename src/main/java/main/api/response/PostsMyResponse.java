@@ -6,15 +6,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import main.utils.HtmlParser;
-import org.springframework.stereotype.Component;
+import main.util.HtmlParser;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Component
 public class PostsMyResponse {
     private static final int STRING_LENGTH = 150;
     private int count;

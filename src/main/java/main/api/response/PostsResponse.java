@@ -1,20 +1,18 @@
 package main.api.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Setter;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import main.utils.HtmlParser;
-import org.springframework.stereotype.Component;
+import lombok.Setter;
+import main.util.HtmlParser;
 
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Component
 public class PostsResponse {
     private static final int STRING_LENGTH = 150;
     private int count;

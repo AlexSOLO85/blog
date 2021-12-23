@@ -1,4 +1,4 @@
-package main.utils;
+package main.util;
 
 import org.springframework.stereotype.Service;
 

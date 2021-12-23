@@ -3,7 +3,6 @@ package main.api.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.sql.Date;
 import java.util.Comparator;
@@ -15,7 +14,6 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-@Component
 public class CalendarResponse {
     private List<Integer> years;
     private HashMap<String, Integer> posts;

@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

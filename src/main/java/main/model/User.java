@@ -1,11 +1,14 @@
 package main.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import main.enumerated.Role;
+import org.hibernate.Hibernate;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import javax.persistence.CascadeType;
@@ -18,9 +21,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@ToString
+@RequiredArgsConstructor
 @NoArgsConstructor
 
 @Entity
@@ -30,18 +36,24 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
+    @NonNull
     @Column(name = "is_moderator", nullable = false)
     private Boolean isModerator;
+    @NonNull
     @Column(name = "reg_time", nullable = false)
     private LocalDateTime regTime;
+    @NonNull
     @Column(name = "name", nullable = false)
     private String name;
+    @NonNull
     @Column(name = "email", nullable = false)
     private String email;
+    @NonNull
     @Column(name = "password", nullable = false)
     private String password;
     @Column(name = "code")
     private String code;
+    @NonNull
     @Column(name = "photo")
     private String photo;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL,
@@ -73,5 +85,22 @@ public class User {
                 .getContext()
                 .getAuthentication()
                 .isAuthenticated();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) {
+            return false;
+        }
+        User user = (User) o;
+        return id != null && Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

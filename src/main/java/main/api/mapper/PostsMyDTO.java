@@ -2,7 +2,7 @@ package main.api.mapper;
 
 import main.api.response.PostsMyResponse;
 import main.model.Post;
-import main.utils.LocalTimeMapper;
+import main.util.LocalTimeMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

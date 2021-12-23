@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import lombok.RequiredArgsConstructor;
 import main.api.mapper.PostsDTO;
@@ -22,7 +22,6 @@ import main.model.enumerated.ModerationStatus;
 import main.repository.PostCommentRepository;
 import main.repository.PostRepository;
 import main.repository.TagRepository;
-import main.utils.SaveToEntity;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -55,8 +54,6 @@ public class PostService {
     private final SettingsService settingsService;
     private final PostsDTO postsDTO;
     private final PostsMyDTO postsMyDTO;
-    private final PostsResponse postsResponse;
-    private final PostsMyResponse postsMyResponse;
 
     public final Post getPostById(final int id) {
         Optional<Post> optionalPost = postRepository.findById((long) id);
@@ -100,26 +97,19 @@ public class PostService {
         if (response != null) {
             return response;
         }
-        Post currentPost = new SaveToEntity().postToEntity(
-                isActive,
+        Post currentPost = new Post(isActive,
                 isCurrentSettingOn() ? ModerationStatus.NEW
                         : ModerationStatus.ACCEPTED,
-                user,
-                timestamp,
-                title,
-                text,
-                0);
+                user, timestamp, title, text, 0);
         postRepository.save(currentPost);
         for (String tag : tags) {
             if (!tag.isBlank()) {
                 Tag currentTag = tagRepository
                         .getTagByName(tag) != null
                         ? tagRepository.getTagByName(tag)
-                        : tagService.addTag(
-                        new SaveToEntity().tagToEntity(tag));
-                tagToPostService.addTagToPost(
-                        new SaveToEntity()
-                                .tagToPostToEntity(currentTag, currentPost));
+                        : tagService.addTag(new Tag(tag));
+                tagToPostService.addTagToPost(new TagToPost(currentTag,
+                        currentPost));
             }
         }
         return new ResponseEntity<>(new BooleanResponse(true), HttpStatus.OK);
@@ -169,10 +159,8 @@ public class PostService {
                 Tag currentTag = tagRepository
                         .getTagByName(tag) != null
                         ? tagRepository.getTagByName(tag)
-                        : tagService.addTag(
-                        new SaveToEntity().tagToEntity(tag));
-                TagToPost tagToPost = new SaveToEntity()
-                        .tagToPostToEntity(currentTag, post);
+                        : tagService.addTag(new Tag(tag));
+                TagToPost tagToPost = new TagToPost(currentTag, post);
                 tagToPostService.addTagToPost(tagToPost);
             }
         }
@@ -201,13 +189,11 @@ public class PostService {
         if (postId != null) {
             parentPost = getPostById(postId);
         }
+        assert parentComment != null;
+        assert parentPost != null;
         PostComment newComment = postCommentRepository.save(
-                new SaveToEntity().postCommentToEntity(
-                        parentComment,
-                        user,
-                        parentPost,
-                        LocalDateTime.now(ZoneOffset.UTC),
-                        text));
+                new PostComment(parentComment, parentPost, user,
+                        LocalDateTime.now(ZoneOffset.UTC), text));
         return new ResponseEntity<>(
                 new PostCommentResponse(
                         Math.toIntExact(newComment.getId())), HttpStatus.OK);
@@ -236,36 +222,40 @@ public class PostService {
     public final ResponseEntity<PostsResponse> getRecentPosts(
             final int offset,
             final int limit) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countAllPosts());
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .recentPosts(PageRequest.of(offset, limit))));
+                .recentPosts(PageRequest.of(offset / limit, limit))));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
     public final ResponseEntity<PostsResponse> getBestPosts(
             final int offset,
             final int limit) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countAllPosts());
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .bestPosts(PageRequest.of(offset, limit))));
+                .bestPosts(PageRequest.of(offset / limit, limit))));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
     public final ResponseEntity<PostsResponse> getPopularPosts(
             final int offset,
             final int limit) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countAllPosts());
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .popularPosts(PageRequest.of(offset, limit))));
+                .popularPosts(PageRequest.of(offset / limit, limit))));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
     public final ResponseEntity<PostsResponse> getEarlyPosts(
             final int offset,
             final int limit) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countAllPosts());
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .earlyPosts(PageRequest.of(offset, limit))));
+                .earlyPosts(PageRequest.of(offset / limit, limit))));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
@@ -273,9 +263,10 @@ public class PostService {
             final int offset,
             final int limit,
             final String query) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countSearchedPosts(query));
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .searchPosts(PageRequest.of(offset, limit), query)));
+                .searchPosts(PageRequest.of(offset / limit, limit), query)));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
@@ -283,9 +274,10 @@ public class PostService {
             final int offset,
             final int limit,
             final String date) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countPostsByDate(date));
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .getPostsByDate(date, PageRequest.of(offset, limit))));
+                .getPostsByDate(date, PageRequest.of(offset / limit, limit))));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
@@ -293,9 +285,10 @@ public class PostService {
             final int offset,
             final int limit,
             final String tag) {
+        PostsResponse postsResponse = new PostsResponse();
         postsResponse.setCount(postRepository.countPostsByTag(tag));
         postsResponse.setPostsDTOs(postsDTO.toPostDTOs(postRepository
-                .getPostsByTag(tag, PageRequest.of(offset, limit))));
+                .getPostsByTag(tag, PageRequest.of(offset / limit, limit))));
         return new ResponseEntity<>(postsResponse, HttpStatus.OK);
     }
 
@@ -304,6 +297,7 @@ public class PostService {
             final int limit,
             final String status,
             final long userId) {
+        PostsMyResponse postsMyResponse = new PostsMyResponse();
         switch (status) {
             case "inactive":
                 postsMyResponse.setCount(
@@ -312,7 +306,7 @@ public class PostService {
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
                                 .getMyNotActivePosts(PageRequest
-                                        .of(offset, limit), userId)));
+                                        .of(offset / limit, limit), userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
             case "pending":
                 postsMyResponse.setCount(
@@ -320,7 +314,8 @@ public class PostService {
                                 ModerationStatus.NEW, userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyActivePosts(PageRequest.of(offset, limit),
+                                .getMyActivePosts(PageRequest
+                                                .of(offset / limit, limit),
                                         ModerationStatus.NEW,
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
@@ -330,7 +325,8 @@ public class PostService {
                                 ModerationStatus.DECLINED, userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyActivePosts(PageRequest.of(offset, limit),
+                                .getMyActivePosts(PageRequest
+                                                .of(offset / limit, limit),
                                         ModerationStatus.DECLINED,
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
@@ -340,7 +336,8 @@ public class PostService {
                                 ModerationStatus.ACCEPTED, userId));
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
-                                .getMyActivePosts(PageRequest.of(offset, limit),
+                                .getMyActivePosts(PageRequest
+                                                .of(offset / limit, limit),
                                         ModerationStatus.ACCEPTED,
                                         userId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
@@ -354,6 +351,7 @@ public class PostService {
             final int limit,
             final String status,
             final int moderateUserId) {
+        PostsMyResponse postsMyResponse = new PostsMyResponse();
         switch (status.toLowerCase()) {
             case "new":
                 postsMyResponse.setCount(
@@ -361,7 +359,7 @@ public class PostService {
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
                                 .getPostsForModeration(PageRequest
-                                        .of(offset, limit))));
+                                        .of(offset / limit, limit))));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
             case "declined":
                 postsMyResponse.setCount(
@@ -371,7 +369,7 @@ public class PostService {
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
                                 .getPostsModeratedByMe(PageRequest
-                                                .of(offset, limit),
+                                                .of(offset / limit, limit),
                                         ModerationStatus.DECLINED,
                                         moderateUserId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);
@@ -383,7 +381,7 @@ public class PostService {
                 postsMyResponse.setPostsDTOs(
                         postsMyDTO.toPostDTOs(postRepository
                                 .getPostsModeratedByMe(PageRequest
-                                                .of(offset, limit),
+                                                .of(offset / limit, limit),
                                         ModerationStatus.ACCEPTED,
                                         moderateUserId)));
                 return new ResponseEntity<>(postsMyResponse, HttpStatus.OK);

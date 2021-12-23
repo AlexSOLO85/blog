@@ -1,4 +1,4 @@
-package main.utils;
+package main.util;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

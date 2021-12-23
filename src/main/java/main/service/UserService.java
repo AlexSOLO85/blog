@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import lombok.RequiredArgsConstructor;
 import main.api.request.ChangePassRequest;
@@ -19,8 +19,7 @@ import main.repository.CaptchaRepository;
 import main.repository.PostRepository;
 import main.repository.PostVoteRepository;
 import main.repository.UserRepository;
-import main.utils.LocalTimeMapper;
-import main.utils.SaveToEntity;
+import main.util.LocalTimeMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -113,8 +112,7 @@ public class UserService {
             return response;
         }
         String hashedPassword = passwordEncoder(password);
-        User user = new SaveToEntity().userToEntity(false,
-                LocalDateTime.now(ZoneOffset.UTC),
+        User user = new User(false, LocalDateTime.now(ZoneOffset.UTC),
                 name, email, hashedPassword, defaultPhoto);
         userRepository.save(user);
         return new ResponseEntity<>(new BooleanResponse(true), HttpStatus.OK);
@@ -217,7 +215,7 @@ public class UserService {
 
     private void isRemovePhotoByUser(final User user, final Byte removePhoto) {
         if (removePhoto != null && removePhoto == 1) {
-            user.setPhoto(null);
+            user.setPhoto("");
         }
     }
 

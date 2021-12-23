@@ -1,7 +1,7 @@
 package main.controller;
 
 import lombok.RequiredArgsConstructor;
-import main.services.FilesService;
+import main.service.FilesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

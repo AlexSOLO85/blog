@@ -8,10 +8,9 @@ import main.api.request.RestorePassRequest;
 import main.api.response.BooleanResponse;
 import main.api.response.CaptchaResponse;
 import main.api.response.LoginResponse;
-import main.services.CaptchaService;
-import main.services.LoginService;
-import main.services.LogoutService;
-import main.services.UserService;
+import main.service.AuthService;
+import main.service.CaptchaService;
+import main.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,12 +28,12 @@ import java.security.Principal;
 public class ApiAuthController {
     private final CaptchaService captchaService;
     private final UserService userService;
-    private final LoginService loginService;
-    private final LogoutService logoutService;
+    private final AuthService authService;
+
     @GetMapping("/check")
     public final ResponseEntity<?> authCheckResponse(
             final Principal principal) {
-        return loginService.check(principal);
+        return authService.check(principal);
     }
 
     @GetMapping("/captcha")
@@ -51,14 +50,14 @@ public class ApiAuthController {
     @PostMapping("/login")
     public final ResponseEntity<LoginResponse> login(
             final @RequestBody LoginRequest loginRequest) {
-        return loginService.login(loginRequest);
+        return authService.login(loginRequest);
     }
 
     @GetMapping("/logout")
     public final ResponseEntity<BooleanResponse> logout(
             final HttpServletRequest request,
             final HttpServletResponse response) {
-        return logoutService.logout(request, response);
+        return authService.logout(request, response);
     }
 
     @PostMapping("/restore")

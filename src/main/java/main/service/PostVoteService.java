@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import lombok.RequiredArgsConstructor;
 import main.api.request.PostVoteRequest;
@@ -7,7 +7,6 @@ import main.model.Post;
 import main.model.PostVote;
 import main.model.User;
 import main.repository.PostVoteRepository;
-import main.utils.SaveToEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class PostVoteService {
                 .getPostVoteByPostIdAndUserId(postId, user.getId());
         if (beforeLike == null) {
             postVoteRepository
-                    .save(new SaveToEntity().postVoteToEntity(
+                    .save(new PostVote(
                             user,
                             currentPost,
                             LocalDateTime.now(ZoneOffset.UTC),
@@ -61,7 +60,7 @@ public class PostVoteService {
             currentPost.getPostVotes().remove(beforeLike);
             postVoteRepository.delete(beforeLike);
             postVoteRepository
-                    .save(new SaveToEntity().postVoteToEntity(
+                    .save(new PostVote(
                             user,
                             currentPost,
                             LocalDateTime.now(ZoneOffset.UTC),

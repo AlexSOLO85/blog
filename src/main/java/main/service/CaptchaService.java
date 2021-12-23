@@ -1,4 +1,4 @@
-package main.services;
+package main.service;
 
 import com.github.cage.Cage;
 import com.github.cage.ObjectRoulette;
@@ -9,7 +9,6 @@ import com.github.cage.token.RandomTokenGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import main.api.response.CaptchaResponse;
-import main.utils.SaveToEntity;
 import main.model.CaptchaCode;
 import main.repository.CaptchaRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,8 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.awt.Color;
-import java.awt.Font;
+import java.awt.*;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -55,8 +53,6 @@ public class CaptchaService {
     private static final int UNICODE_LETTER_A_UPPERCASE = 65;
     private static final int UNICODE_LETTER_A_LOWERCASE = 97;
     private final CaptchaRepository captchaRepository;
-    private final SaveToEntity saveToEntity;
-    private final CaptchaResponse captchaResponse;
 
     public final ResponseEntity<CaptchaResponse> generateCaptcha() {
         LocalDateTime captchaDeleteBeforeTime =
@@ -72,9 +68,10 @@ public class CaptchaService {
         byte[] encodedBytes = Base64.getEncoder().encode(cage.draw(token));
         String captchaImageBase64String = captchaFormatString + ", "
                 + new String(encodedBytes, StandardCharsets.UTF_8);
-        CaptchaCode newCaptcha = saveToEntity
-                .captchaCodeToEntity(LocalDateTime.now(), token, secretCode);
+        CaptchaCode newCaptcha =
+                new CaptchaCode(LocalDateTime.now(), token, secretCode);
         captchaRepository.save(newCaptcha);
+        CaptchaResponse captchaResponse = new CaptchaResponse();
         captchaResponse.setSecret(secretCode);
         captchaResponse.setImage(captchaImageBase64String);
         return new ResponseEntity<>(captchaResponse, HttpStatus.OK);
