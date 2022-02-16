@@ -32,7 +32,10 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
             + "order by p.time desc")
     List<Post> recentPosts(Pageable pageable);
 
-    @Query("select p, sum(pv.value) as sum_votes from Post p "
+    @Query("select p, "
+            + "sum(case when pv.value = 1 then 1 else 0 end) - "
+            + "sum(case when pv.value = -1 then 1 else 0 end) as sum_votes "
+            + "from Post p "
             + "left join p.postVotes pv "
             + "where p.isActive = true "
             + "and p.moderationStatus = 'ACCEPTED' "
@@ -104,7 +107,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
 
     @Query("select distinct p, t2p from Post p "
             + "inner join p.tagsToPosts t2p "
-            + "where t2p.tag.name like %:tag% "
+            + "where t2p.tag.name = :tag "
             + "and p.isActive = true "
             + "and p.moderationStatus = 'ACCEPTED' "
             + "and p.time < current_time "
@@ -113,7 +116,7 @@ public interface PostRepository extends PagingAndSortingRepository<Post, Long> {
 
     @Query("select distinct count(p.id) from Post p "
             + "inner join p.tagsToPosts t2p "
-            + "where t2p.tag.name like %:tag% "
+            + "where t2p.tag.name = :tag "
             + "and p.isActive = true "
             + "and p.moderationStatus = 'ACCEPTED' "
             + "and p.time < current_time")

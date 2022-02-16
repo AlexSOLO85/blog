@@ -35,7 +35,6 @@ public class PostComment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Long id;
-    @NonNull
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private PostComment parentId;

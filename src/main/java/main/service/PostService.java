@@ -192,7 +192,7 @@ public class PostService {
         assert parentComment != null;
         assert parentPost != null;
         PostComment newComment = postCommentRepository.save(
-                new PostComment(parentComment, parentPost, user,
+                new PostComment(parentPost, user,
                         LocalDateTime.now(ZoneOffset.UTC), text));
         return new ResponseEntity<>(
                 new PostCommentResponse(
