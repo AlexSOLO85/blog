@@ -17,7 +17,7 @@
     </changeSet>
     <changeSet id="6.3" author="Alexander">
         <insert tableName="tags">
-            <column name="name" value="C++"/>
+            <column name="name" value="Hibernate"/>
         </insert>
     </changeSet>
     <changeSet id="6.4" author="Alexander">
